@@ -1,0 +1,12 @@
+﻿@model WebApplication1.ViewModel.UserViewModel
+
+<h2>Profile for @Model.UserName</h2>
+
+<p>Email: @Model.Email</p>
+<p>Name: @Model.UserName</p>
+<p>Address: @Model.Address</p>
+<p>Phone Number: @Model.PhoneNumber</p>
+
+<!-- Link to Edit Profile page -->
+<a class="btn btn-primary" href="@Url.Action("EditProfile", "Account")">Edit Profile</a>
+<a class="btn btn-secondary" href="@Url.Action("ChangePassword", "Account")">Change Password</a>
