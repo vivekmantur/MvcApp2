@@ -7,46 +7,27 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        @* <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/logo.png" alt="Logo" style="height: 40px;" />
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div>
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto flex justify-between items-center py-4 px-6">
+            <div class="flex items-center">
+                <img alt="PrimeCarDeals Logo" class="h-10 w-10" height="50" src="https://storage.googleapis.com/a1aa/image/9tJvoMS5V1Y1AVqcUYmOaXwzixIu0fFgQxwlBBAVrGZfzcxTA.jpg" width="50" />
+                <span class="ml-2 text-xl font-bold">
+                    PrimeCarDeals
+                </span>
             </div>
-        </nav> *@
-        <div class="header">
-            <img alt="PrimeCarDeals Logo" height="50" src="https://storage.googleapis.com/a1aa/image/u2ifQl28tOWxEK2PVRgSAPEnFfu8e6QKr96LcBBNdeae0UJeE.jpg" width="50" />
-            <nav>
-                <a href="#">
-                    HOME
-                </a>
-                <a href="#">
-                    LOGIN
-                </a>
-                <a href="#">
-                    SIGN UP
-                </a>
-                <a href="#">
-                    ABOUT
-                </a>
+            <nav class="space-x-6">
+                <partial name="_LoginPartial" />
             </nav>
         </div>
     </header>
@@ -56,31 +37,28 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        @* <div class="container">
-            &copy; 2024 - WebApplication1 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div> *@
-        <div class="footer">
-            <div class="social-icons">
-                <a href="#">
+    <footer class="bg-gray-300 py-4 mt-10">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex space-x-4">
+                <a class="text-gray-800" href="#">
                     <i class="fab fa-facebook-f">
                     </i>
                 </a>
-                <a href="#">
+                <a class="text-gray-800" href="#">
                     <i class="fab fa-instagram">
                     </i>
                 </a>
             </div>
-            <div class="copyright">
+            <div class="text-gray-800">
                 PrimeCarDeals
                 <br />
                 Copyright © 2024 PrimeCarDeals, Inc.
             </div>
-            <div class="links">
-                <a href="#">
+            <div class="text-gray-800 space-x-4">
+                <a class="hover:underline" href="#">
                     Terms and Conditions
                 </a>
-                <a href="#">
+                <a class="hover:underline" href="#">
                     Privacy Policies
                 </a>
             </div>
