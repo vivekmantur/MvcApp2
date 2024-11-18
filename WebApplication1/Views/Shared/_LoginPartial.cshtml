@@ -5,10 +5,12 @@
 @if (SignInManager.IsSignedIn(User))
 {
     var user = await UserManager.GetUserAsync(User);
-
     <!-- User logged in, show profile and logout options -->
     <div class="d-flex align-items-center">
-        <span class="mr-3">Hello, @User.Identity.Name!</span>
+@*         <span class="mr-3">Hello, @User.Identity.Name!</span>
+ *@        <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Dashboard">Home</a>
+        <a class="btn btn-link text-dark" asp-controller="account" asp-action="Dashboard">Buy</a>
+        <a class="btn btn-link text-dark" asp-controller="account" asp-action="Dashboard">Sell</a>
         <a class="btn btn-link text-dark" asp-controller="account" asp-action="ViewProfile" asp-route-email="@user.Email">Profile</a>
         <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Logout">Logout</a>
     </div>
@@ -17,7 +19,7 @@ else
 {
     <!-- User not logged in, show login, register, and about links -->
     <div class="d-flex justify-content-start align-items-center">
-        <a class="btn btn-link text-dark ml-3" asp-controller="home" asp-action="Index">About</a>
+        <a class="btn btn-link text-dark ml-3" asp-controller="home" asp-action="Index">Home</a>
         <a class="btn btn-link text-dark" asp-controller="account" asp-action="Login">Login</a>
         <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Register">Sign Up</a>
 

@@ -28,7 +28,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPost, AllowAnonymous]
-        public IActionResult Register(UserViewModel request)
+        public async Task<IActionResult> Register(UserViewModel request)
         {
             if (ModelState.IsValid)
             {
@@ -40,8 +40,10 @@ namespace WebApplication1.Controllers
                     PhoneNumber = request.PhoneNumber,
                     Address = request.Address,
                 };
-                var result = userManager.CreateAsync(user, request.Password).Result;
-                if (result.Succeeded)
+
+                var result = await userManager.CreateAsync(user, request.Password);
+                var res = await userManager.AddToRoleAsync(user, "User");
+                if (result.Succeeded&&res.Succeeded)
                 {
                     return RedirectToAction("Login");
                 }

@@ -7,6 +7,7 @@ namespace WebApplication1.Models
     {
 
         public string Address { get; set; }
-     
+
+        
     }
 }
