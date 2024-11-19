@@ -1,0 +1,9 @@
+﻿@using WebApplication1.ViewModel
+
+@model VerifyOtpViewModel
+
+<form asp-action="VerifyOtp" method="post">
+	<label>OTP:</label>
+	<input asp-for="OTP" />
+	<button type="submit">Verify</button>
+</form>

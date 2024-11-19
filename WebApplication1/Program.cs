@@ -19,7 +19,7 @@ builder.Services.AddIdentity<UserRegistration, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<WebApplication1Context>()
 .AddDefaultTokenProviders();
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddTransient<EmailService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

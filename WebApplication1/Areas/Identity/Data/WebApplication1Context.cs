@@ -4,11 +4,17 @@ using WebApplication1.Models;
 namespace WebApplication1.Data;
 public class WebApplication1Context : IdentityDbContext<UserRegistration>
 {
+    
     public WebApplication1Context(DbContextOptions<WebApplication1Context> options)
         : base(options)
     {
 
     }
+    public DbSet<Sell> Sells { get; set; }
+
+    public DbSet<Requests> Requests { get; set; }
+
+    public DbSet<CarDetails> CarDetails { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

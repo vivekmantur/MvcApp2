@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1.Data;
 
@@ -11,9 +12,11 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(WebApplication1Context))]
-    partial class WebApplication1ContextModelSnapshot : ModelSnapshot
+    [Migration("20241119124030_v2")]
+    partial class v2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,58 +156,6 @@ namespace WebApplication1.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.CarDetails", b =>
-                {
-                    b.Property<int>("carId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("carId"));
-
-                    b.Property<string>("CarName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Kilometers")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("OwnerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Variant")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
-
-                    b.Property<string>("address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("carId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("CarDetails");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Requests", b =>
@@ -452,17 +403,6 @@ namespace WebApplication1.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.CarDetails", b =>
-                {
-                    b.HasOne("WebApplication1.Models.UserRegistration", "User")
-                        .WithMany("CarDetails")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("WebApplication1.Models.Requests", b =>
                 {
                     b.HasOne("WebApplication1.Models.Sell", "Sell")
@@ -493,8 +433,6 @@ namespace WebApplication1.Migrations
 
             modelBuilder.Entity("WebApplication1.Models.UserRegistration", b =>
                 {
-                    b.Navigation("CarDetails");
-
                     b.Navigation("Sells");
                 });
 #pragma warning restore 612, 618

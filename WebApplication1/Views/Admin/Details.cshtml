@@ -1,0 +1,34 @@
+﻿@model WebApplication1.Models.Requests
+
+@{
+    ViewData["Title"] = "Request Details";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h3>Car Details</h3>
+    <p><strong>Request ID:</strong> @Model.RequestId</p>
+    <p><strong>Seller Name:</strong> @Model.Sellername</p>
+    <p><strong>Car Name:</strong> @Model.Carname</p>
+    <p><strong>Price:</strong> @Model.Price</p>
+    <p><strong>Status:</strong> @Model.status</p>
+
+    <h3>Additional Car Details</h3>
+    <p><strong>Kilometers:</strong> @Model.Sell.Kilometers</p>
+    <p><strong>Variant:</strong> @Model.Sell.Variant</p>
+    <p><strong>Manufacture Year:</strong> @Model.Sell.Year</p>
+    <p><strong>Brand:</strong> @Model.Sell.Brand</p>
+    <p><strong>Condition:</strong> @Model.Sell.City</p>
+
+    @if (Model.status == "Pending")
+    {
+        <form method="post" action="@Url.Action("Approve", "Admin", new { id = Model.RequestId })">
+            <button type="submit" class="btn btn-primary">Approve Request</button>
+        </form>
+    }
+    else
+    {
+        <p>This request is already approved.</p>
+    }
+</div>

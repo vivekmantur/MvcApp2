@@ -2,15 +2,28 @@
 @inject SignInManager<UserRegistration> SignInManager
 @inject UserManager<UserRegistration> UserManager
 
-@if (SignInManager.IsSignedIn(User))
+@if (SignInManager.IsSignedIn(User) && User.IsInRole("User"))
 {
     var user = await UserManager.GetUserAsync(User);
     <!-- User logged in, show profile and logout options -->
     <div class="d-flex align-items-center">
-@*         <span class="mr-3">Hello, @User.Identity.Name!</span>
- *@        <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Dashboard">Home</a>
+        @*         <span class="mr-3">Hello, @User.Identity.Name!</span>
+    *@        <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Dashboard">Home</a>
         <a class="btn btn-link text-dark" asp-controller="account" asp-action="Dashboard">Buy</a>
-        <a class="btn btn-link text-dark" asp-controller="account" asp-action="Dashboard">Sell</a>
+        <a class="btn btn-link text-dark" asp-controller="user" asp-action="Sell">Sell</a>
+        <a class="btn btn-link text-dark" asp-controller="account" asp-action="ViewProfile" asp-route-email="@user.Email">Profile</a>
+        <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Logout">Logout</a>
+    </div>
+}
+else if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+{
+    var user = await UserManager.GetUserAsync(User);
+    <div class="d-flex align-items-center">
+        @*         <span class="mr-3">Hello, @User.Identity.Name!</span>
+    *@
+        <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Dashboard">Home</a>
+        <a class="btn btn-link text-dark" asp-controller="Admin" asp-action="Index">Requests</a>
+        <a class="btn btn-link text-dark" asp-controller="Admin" asp-action="RequestApproved">Requests Approved</a>
         <a class="btn btn-link text-dark" asp-controller="account" asp-action="ViewProfile" asp-route-email="@user.Email">Profile</a>
         <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Logout">Logout</a>
     </div>

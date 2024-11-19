@@ -1,0 +1,199 @@
+﻿@model WebApplication1.Models.Sell
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@* <style>
+    /* Background Image Style */
+    body {
+        background-image: url('/images/background.jpg'); /* Path from wwwroot */
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+</style> *@
+<div class="container">
+    <h1>Register</h1>
+    @Html.ValidationSummary()
+
+    <!-- Main form -->
+    <form asp-action="Sell" asp-controller="User" method="post" enctype="multipart/form-data">
+        <div class="row g-3">
+
+            <!-- OwnerName -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="OwnerName" class="form-label">Owner Name</label>
+                    @Html.TextBoxFor(m => m.OwnerName, new { placeholder = "Owner Name", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.OwnerName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- CarName -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="CarName" class="form-label">Car Name</label>
+                    @Html.TextBoxFor(m => m.CarName, new { placeholder = "Car Name", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.CarName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Variant -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Variant" class="form-label">Variant</label>
+                    @Html.TextBoxFor(m => m.Variant, new { placeholder = "Variant", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Variant, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <!-- Transmission Type -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Transmission" class="form-label">Vehicle Transmission</label>
+                    <select asp-for="Transmission" class="form-control">
+                        <option value="Automatic">Automatic</option>
+                        <option value="Manual">Manual</option>
+                    </select>
+                    @Html.ValidationMessageFor(m => m.Transmission, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <!-- Fuel Type -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="FuelType" class="form-label">Fuel Type</label>
+                    <select asp-for="FuelType" class="form-control">
+                        <option value="Diesel">Diesel</option>
+                        <option value="Petrol">Petrol</option>
+                    </select>
+                    @Html.ValidationMessageFor(m => m.FuelType, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Manufacture Year -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Year" class="form-label">Manufacture Year</label>
+                    @Html.TextBoxFor(m => m.Year, new { placeholder = "Manufacture Year", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Year, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Vehicle Type -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="VehicleType" class="form-label">Vehicle Type</label>
+                    <select asp-for="VehicleType" class="form-control">
+                        <option value="SUV">SUV</option>
+                        <option value="Hatchback">Hatchback</option>
+                        <option value="Sedan">Sedan</option>
+                    </select>
+                    @Html.ValidationMessageFor(m => m.VehicleType, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Price -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Price" class="form-label">Vehicle Estimated Sold Price</label>
+                    @Html.TextBoxFor(m => m.Price, new { placeholder = "Vehicle Estimated Sold Price", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Brand -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Brand" class="form-label">Vehicle Brand</label>
+                    @Html.TextBoxFor(m => m.Brand, new { placeholder = "Vehicle Brand", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Brand, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Chassis Number -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="ChassisNumber" class="form-label">Chassis Number</label>
+                    @Html.TextBoxFor(m => m.ChassisNumber, new { placeholder = "Vehicle Chassis Number", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ChassisNumber, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Kilometers -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Kilometers" class="form-label">Kilometers Driven</label>
+                    @Html.TextBoxFor(m => m.Kilometers, new { placeholder = "Kilometers Driven", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Kilometers, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- RcNumber -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="RcNumber" class="form-label">Vehicle Rc Number</label>
+                    @Html.TextBoxFor(m => m.RcNumber, new { placeholder = "Vehicle Rc Number", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.RcNumber, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Address" class="form-label">Address</label>
+                    @Html.TextBoxFor(m => m.Address, new { placeholder = "Address", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Address, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- City -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="City" class="form-label">Nearest City</label>
+                    @Html.TextBoxFor(m => m.City, new { placeholder = "Nearest City", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.City, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Image Uploads -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="FrontImage" class="form-label">Upload Car Front Image</label>
+                    <input type="file" name="FrontImage" id="FrontImage" class="form-control" />
+                    @Html.ValidationMessageFor(m => m.FrontImage, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="RearImage" class="form-label">Upload Car Rear Image</label>
+                    <input type="file" name="RearImage" id="RearImage" class="form-control" />
+                    @Html.ValidationMessageFor(m => m.RearImage, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="LeftImage" class="form-label">Upload Car Left Image</label>
+                    <input type="file" name="LeftImage" id="LeftImage" class="form-control" />
+                    @Html.ValidationMessageFor(m => m.LeftImage, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="RightImage" class="form-label">Upload Car Right Image</label>
+                    <input type="file" name="RightImage" id="RightImage" class="form-control" />
+                    @Html.ValidationMessageFor(m => m.RightImage, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="col-12">
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>

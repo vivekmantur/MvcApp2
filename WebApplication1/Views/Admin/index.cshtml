@@ -1,0 +1,35 @@
+﻿@model IEnumerable<WebApplication1.Models.Requests>
+
+@{
+    ViewData["Title"] = "Requests List";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Request ID</th>
+            <th>Seller Name</th>
+            <th>Car Name</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.RequestId</td>
+                <td>@request.Sellername</td>
+                <td>@request.Carname</td>
+                <td>@request.Price</td>
+                <td>@request.status</td>
+                <td>
+                    <a href="@Url.Action("Details", "Admin", new { id = request.RequestId })">More Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
