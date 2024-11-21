@@ -15,6 +15,10 @@ public class WebApplication1Context : IdentityDbContext<UserRegistration>
     public DbSet<Requests> Requests { get; set; }
 
     public DbSet<CarDetails> CarDetails { get; set; }
+
+    public DbSet<CarsSold> CarsSold { get; set; }
+
+    public DbSet<Payment> Payments { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

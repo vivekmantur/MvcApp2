@@ -6,7 +6,7 @@ namespace WebApplication1.Models
     public class CarDetails
     {
         [Key]
-        public int carId { get; set; }
+        public int CarId { get; set; }
 
         public string UserId { get; set; }
 
@@ -25,6 +25,20 @@ namespace WebApplication1.Models
         public string address { get; set; }
 
         public string City { get; set; }
+
+        public string Transmission { get; set; }
+
+        public string FuelType { get; set; }
+
+        public string VehicleType { get; set; }
+
+        public byte[] FrontImage { get; set; }
+
+        public byte[] RearImage { get; set; }
+
+        public byte[] LeftImage { get; set; }
+
+        public byte[] RightImage { get; set; }
 
         public string Status { get; set; } = "unsold";
 

@@ -6,20 +6,38 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<div>
+<div class="car-details-container">
     <h3>Car Details</h3>
-    <p><strong>Request ID:</strong> @Model.RequestId</p>
-    <p><strong>Seller Name:</strong> @Model.Sellername</p>
-    <p><strong>Car Name:</strong> @Model.Carname</p>
-    <p><strong>Price:</strong> @Model.Price</p>
-    <p><strong>Status:</strong> @Model.status</p>
+    <div class="car-detail-box">
+        <p><strong>Request ID:</strong> @Model.RequestId</p>
+        <p><strong>Seller Name:</strong> @Model.Sellername</p>
+        <p><strong>Car Name:</strong> @Model.Carname</p>
+        <p><strong>Price:</strong> @Model.Price</p>
+        <p><strong>Status:</strong> @Model.status</p>
+    </div>
 
     <h3>Additional Car Details</h3>
-    <p><strong>Kilometers:</strong> @Model.Sell.Kilometers</p>
-    <p><strong>Variant:</strong> @Model.Sell.Variant</p>
-    <p><strong>Manufacture Year:</strong> @Model.Sell.Year</p>
-    <p><strong>Brand:</strong> @Model.Sell.Brand</p>
-    <p><strong>Condition:</strong> @Model.Sell.City</p>
+    <div class="additional-detail-box">
+        <p><strong>Kilometers:</strong> @Model.Sell.Kilometers</p>
+        <p><strong>Variant:</strong> @Model.Sell.Variant</p>
+        <p><strong>Manufacture Year:</strong> @Model.Sell.Year</p>
+        <p><strong>Brand:</strong> @Model.Sell.Brand</p>
+        <p><strong>City:</strong> @Model.Sell.City</p>
+    </div>
+
+    <h3>Car Image</h3>
+    <div class="car-image-box">
+        @{
+            string imageSrc = "";
+            if (ViewBag.LeftImage != null && ViewBag.LeftImage.Length > 0)
+            {
+                // Convert byte[] to Base64 string
+                var base64String = Convert.ToBase64String(ViewBag.LeftImage);
+                imageSrc = $"data:image/jpeg;base64,{base64String}"; // Assign the Base64 string
+            }
+        }
+        <img id="profilePicPreview" src="@imageSrc" alt="Car Image" class="car-image-preview" />
+    </div>
 
     @if (Model.status == "Pending")
     {
@@ -32,3 +50,51 @@
         <p>This request is already approved.</p>
     }
 </div>
+
+<!-- Add this in your stylesheet (or in the <style> tag in the HTML head) -->
+<style>
+    .car-details-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .car-detail-box,
+    .additional-detail-box,
+    .car-image-box {
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .car-detail-box,
+    .additional-detail-box {
+        margin-bottom: 20px;
+    }
+
+        .car-detail-box p,
+        .additional-detail-box p {
+            margin: 5px 0;
+        }
+
+    /* Image styling */
+    .car-image-preview {
+        width: 80%; /* Adjusted width for smaller size */
+        height: auto;
+        object-fit: contain; /* Ensure image is fully visible without distortion */
+        border-radius: 10px;
+        border: 1px solid #ccc;
+    }
+
+    /* Flexbox layout for side-by-side Car Details and Additional Details */
+    .car-detail-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 30px;
+    }
+
+    .car-detail-box,
+    .additional-detail-box {
+        flex: 1;
+    }
+</style>

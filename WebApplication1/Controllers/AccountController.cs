@@ -1,11 +1,12 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Collections.Concurrent;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebApplication1.Data;
 using WebApplication1.Models;
 using WebApplication1.ViewModel;
-using static System.Net.WebRequestMethods;
 
 namespace WebApplication1.Controllers
 {
@@ -14,13 +15,15 @@ namespace WebApplication1.Controllers
         private readonly UserManager<UserRegistration> userManager;
         private readonly SignInManager<UserRegistration> signInManager;
         public EmailService emailService;
-        public static string Otp;
+        public WebApplication1Context context;
+        private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiration)> _otps = new();
         public AccountController(UserManager<UserRegistration> userManager,
-            SignInManager<UserRegistration> signInManager,EmailService emailService)
+            SignInManager<UserRegistration> signInManager,EmailService emailService,WebApplication1Context context)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.emailService = emailService;
+            this.context = context;
         }
         [HttpGet, AllowAnonymous]
         public IActionResult Register()
@@ -64,25 +67,26 @@ namespace WebApplication1.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public IActionResult Login(UserLogin model, String? ReturnUrl)
+        public async Task<IActionResult> Login(UserLogin model, string? ReturnUrl)
         {
             if (ModelState.IsValid)
             {
-                var user = userManager.FindByEmailAsync(model.Email).Result;
+                var user = await userManager.FindByEmailAsync(model.Email);
                 if (user == null)
                 {
                     ModelState.AddModelError("message", "Invalid credentials");
                     return View(model);
                 }
 
-                var passwordCheck = userManager.CheckPasswordAsync(user, model.Password).Result;
+                var passwordCheck = await userManager.CheckPasswordAsync(user, model.Password);
                 if (!passwordCheck)
                 {
                     ModelState.AddModelError("message", "Invalid credentials");
                     return View(model);
                 }
 
-                var result = signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, true).Result;
+                // Sign the user in. Don't use RememberMe for session persistence (it should expire when the browser is closed)
+                var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, true);
                 if (result.Succeeded)
                 {
                     if (ReturnUrl == null)
@@ -103,17 +107,135 @@ namespace WebApplication1.Controllers
             return View(model);
         }
 
-        [Authorize]
-        public IActionResult Dashboard()
-        {
-            return View();
-        }
 
         public IActionResult Logout()
         {
+            // Ensure the session is cleared when logging out
             signInManager.SignOutAsync().Wait();
-            return RedirectToAction("login", "account");
+
+            // Clear session explicitly
+            HttpContext.Session.Clear();
+
+            return RedirectToAction("Login", "Account");
         }
+
+        public IActionResult Dashboard()
+        {
+            var unsoldCarList = context.CarDetails.ToList();
+
+            unsoldCarList = unsoldCarList.Where(i => i.Status == "unsold").ToList();
+
+            var model = new CarDashboardViewModel
+            {
+                Cars = unsoldCarList,  // Load only unsold cars
+                Filter = new CarFilterViewModel()  // Initialize an empty filter
+            };
+
+            return View(model);
+        }
+
+        // Action to filter cars based on the form submission
+        [HttpPost]
+        public IActionResult FilterCars(CarFilterViewModel filter)
+        {
+            var filteredCars = context.CarDetails.ToList();
+
+            if (!string.IsNullOrEmpty(filter.VehicleType))
+            {
+                filteredCars = filteredCars.Where(i => i.VehicleType == filter.VehicleType).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(filter.Transmission))
+            {
+                filteredCars = filteredCars.Where(i => i.Transmission == filter.Transmission).ToList();
+            }
+            if (!string.IsNullOrEmpty(filter.FuelType))
+            {
+                filteredCars = filteredCars.Where(i => i.FuelType == filter.FuelType).ToList();
+            }
+            if (filter.Year.HasValue)
+            {
+                filteredCars = filteredCars.Where(i => i.Year == filter.Year).ToList();
+            }
+            if (filter.MinPrice.HasValue)
+            {
+                filteredCars = filteredCars.Where(i => i.Price >= filter.MinPrice).ToList();
+            }
+            if (filter.MaxPrice.HasValue)
+            {
+                filteredCars = filteredCars.Where(i => i.Price <= filter.MaxPrice).ToList();
+            }
+            var model = new CarDashboardViewModel
+            {
+                Cars = filteredCars ?? new List<CarDetails>(),  // Ensure Cars is always initialized
+                Filter = filter  // Pass the filter back to the view
+            };
+
+            return View("Dashboard", model);  // Return the filtered results to the same view
+        }
+
+        public IActionResult CarDetails(int id)
+        {
+            // Find the car by its ID
+            var car = context.CarDetails.FirstOrDefault(c => c.CarId == id);
+            if (car == null)
+            {
+                return NotFound();
+            }
+            return View(car);
+        }
+
+        public IActionResult Book(int id)
+        {
+            var CarDetails = context.CarDetails.FirstOrDefault(i => i.CarId == id);
+            return View(CarDetails);
+        }
+
+        
+        public IActionResult MakePayment(int id)
+        {
+
+            var carDetails = context.CarDetails.FirstOrDefault(i => i.CarId == id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var amount = carDetails.Price + 10000;
+            Payment payment = new Payment();
+            payment.CarName = carDetails.CarName;
+            payment.SellerName = carDetails.OwnerName;
+            payment.AmountPaid = amount;
+            payment.BuyyerId = userId;
+            payment.CarId = carDetails.CarId;
+
+            context.Payments.Add(payment);
+
+            carDetails.Status = "sold";
+            context.Update(carDetails);
+            context.SaveChanges();
+
+            //payment details of a particular car
+            var carPaymentId = context.Payments.FirstOrDefault(i => i.CarId == id);
+
+            //current login user details
+            var currentUser = context.Users.FirstOrDefault(i => i.Id == userId);
+            CarsSold carsSold = new CarsSold();
+            carsSold.CarId = carDetails.CarId;
+            carsSold.PaymentId = carPaymentId.PaymentId;
+            carsSold.UserId = carDetails.UserId;
+            carsSold.CarName = carDetails.CarName;
+            carsSold.BuyerName = currentUser.UserName;
+            carsSold.CarType = carDetails.VehicleType;
+            carsSold.Price = carDetails.Price;
+            carsSold.SellerName = carDetails.OwnerName;
+            context.CarsSold.Add(carsSold);
+            context.SaveChanges();
+
+
+            ViewBag.Total = payment.AmountPaid;
+            ViewBag.PaymentId = payment.PaymentId;
+            return View();
+            
+
+        }
+
         // ViewProfile GET Action (Synchronous version)
         [HttpGet]
         public IActionResult ViewProfile(string email)
@@ -134,6 +256,8 @@ namespace WebApplication1.Controllers
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
             };
+
+
 
             return View(userModel);
         }
@@ -264,67 +388,68 @@ namespace WebApplication1.Controllers
             return View();
         }
 
-        // Forgot Password (POST)
         [HttpPost]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model, string otp = null)
         {
-            if (ModelState.IsValid)
+            // If no TempData Email exists, we are in the first step (sending OTP)
+            if (TempData["Email"] == null)
             {
-                var user = await userManager.FindByEmailAsync(model.Email);
-                if (user == null)
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("", "Email not found.");
-                    return View(model);
+                    var user = await userManager.FindByEmailAsync(model.Email);
+                    if (user == null)
+                    {
+                        ModelState.AddModelError("", "Email not found.");
+                        return View();
+                    }
+
+                    // Generate OTP
+                    string generatedOtp = new Random().Next(100000, 999999).ToString();
+                    DateTime expiration = DateTime.UtcNow.AddMinutes(3);
+
+                    // Store OTP with expiration
+                    _otps[model.Email] = (generatedOtp, expiration);
+
+                    // Send OTP via email
+                    await emailService.SendEmailAsync(model.Email, "Password Reset OTP", $"Your OTP is {generatedOtp}. It will expire in 3 minutes.");
+
+                    TempData["Email"] = model.Email;
+                    TempData.Keep("Email");
+                    return View();
+                }
+            }
+            else
+            {
+                // Email already provided, validate OTP
+                string email = TempData["Email"].ToString();
+                TempData.Keep("Email");
+
+                if (string.IsNullOrEmpty(otp))
+                {
+                    ModelState.AddModelError("", "Please enter the OTP.");
+                    return View();
                 }
 
-                // Generate OTP
-                Otp = new Random().Next(100000, 999999).ToString();
-                // Send OTP via email
-                await emailService.SendEmailAsync(user.Email, "Password Reset OTP", $"Your OTP is {Otp}");
+                // Check if OTP is valid and not expired
+                if (_otps.TryGetValue(email, out var otpDetails))
+                {
+                    if (otpDetails.Otp == otp && otpDetails.Expiration > DateTime.UtcNow)
+                    {
+                        // OTP verified, remove from store
+                        _otps.TryRemove(email, out _);
 
-                // Store email temporarily
-                TempData["Email"] = model.Email;
+                        // Redirect to reset password
+                        TempData["Email"] = email;
+                        return RedirectToAction("ResetPassword");
+                    }
+                }
 
-                return RedirectToAction("VerifyOtp");
-            }
-            return View(model);
-        }
-
-        // Verify OTP (GET)
-        [HttpGet]
-        public IActionResult VerifyOtp()
-        {
-            if (TempData["Email"] == null)
-                return RedirectToAction("ForgotPassword");
-
-            TempData.Keep("Email");
-            return View();
-        }
-
-        // Verify OTP (POST)
-        [HttpPost]
-        public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model)
-        {
-            if (TempData["Email"] == null)
-                return RedirectToAction("ForgotPassword");
-
-            string email = TempData["Email"].ToString();
-            TempData.Keep("Email");
-            var user = await userManager.FindByEmailAsync(model.Email);
-            if (user == null || Otp != model.OTP)
-            {
                 ModelState.AddModelError("", "Invalid or expired OTP.");
-                return View();
             }
-            if (ModelState.IsValid)
-            {
 
-                return RedirectToAction("ResetPassword");
-            }
             return View();
         }
 
-        // Reset Password (GET)
         [HttpGet]
         public IActionResult ResetPassword()
         {
@@ -335,17 +460,15 @@ namespace WebApplication1.Controllers
             return View();
         }
 
-        // Reset Password (POST)
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (TempData["Email"] == null)
                 return RedirectToAction("ForgotPassword");
 
-            string email = TempData["Email"].ToString();
-            model.Email = email;
+            var email = TempData["Email"].ToString();
 
-            if (model.Password != null && model.ConfirmPassword != null && model.Password == model.ConfirmPassword)
+            if (ModelState.IsValid && model.Password == model.ConfirmPassword)
             {
                 var user = await userManager.FindByEmailAsync(email);
                 if (user == null)
@@ -354,22 +477,23 @@ namespace WebApplication1.Controllers
                     return View(model);
                 }
 
-                // Reset password
+                // Reset the password
                 var resetResult = await userManager.RemovePasswordAsync(user);
                 if (resetResult.Succeeded)
                 {
                     await userManager.AddPasswordAsync(user, model.Password);
                     return RedirectToAction("Login");
                 }
-                else
+
+                foreach (var error in resetResult.Errors)
                 {
-                    foreach (var error in resetResult.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
+                    ModelState.AddModelError("", error.Description);
                 }
             }
+
             return View(model);
         }
+
+      
     }
 }

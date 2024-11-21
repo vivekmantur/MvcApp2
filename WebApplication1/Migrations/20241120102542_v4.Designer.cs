@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1.Data;
 
@@ -11,9 +12,11 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(WebApplication1Context))]
-    partial class WebApplication1ContextModelSnapshot : ModelSnapshot
+    [Migration("20241120102542_v4")]
+    partial class v4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,20 +174,8 @@ namespace WebApplication1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("FrontImage")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("FuelType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("Kilometers")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<byte[]>("LeftImage")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("OwnerName")
                         .IsRequired()
@@ -193,19 +184,7 @@ namespace WebApplication1.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<byte[]>("RearImage")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<byte[]>("RightImage")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
                     b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Transmission")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -214,10 +193,6 @@ namespace WebApplication1.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Variant")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VehicleType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -247,6 +222,9 @@ namespace WebApplication1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("CarDetailsCarId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CarId")
                         .HasColumnType("int");
 
@@ -257,9 +235,6 @@ namespace WebApplication1.Migrations
                     b.Property<string>("CarType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PaymentId")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -274,40 +249,11 @@ namespace WebApplication1.Migrations
 
                     b.HasKey("SoldId");
 
+                    b.HasIndex("CarDetailsCarId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("CarsSold");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Payment", b =>
-                {
-                    b.Property<int>("PaymentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
-
-                    b.Property<decimal>("AmountPaid")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("BuyyerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CarId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CarName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SellerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PaymentId");
-
-                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Requests", b =>
@@ -568,11 +514,19 @@ namespace WebApplication1.Migrations
 
             modelBuilder.Entity("WebApplication1.Models.CarsSold", b =>
                 {
+                    b.HasOne("WebApplication1.Models.CarDetails", "CarDetails")
+                        .WithMany()
+                        .HasForeignKey("CarDetailsCarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WebApplication1.Models.UserRegistration", "User")
                         .WithMany("CarsSold")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CarDetails");
 
                     b.Navigation("User");
                 });

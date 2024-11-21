@@ -1,20 +1,17 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Models;
-
 
 namespace PrimeCarDeals.Controllers
 {
     public class AdminController : Controller
     {
         private readonly WebApplication1Context _context;
-        public UserManager<UserRegistration> userManager { get; set; } 
-        public AdminController(WebApplication1Context context, UserManager<UserRegistration> userManager)
+
+        public AdminController(WebApplication1Context context)
         {
             _context = context;
-            this.userManager = userManager;
         }
 
         // Action to show all requests (synchronous version)
@@ -27,6 +24,7 @@ namespace PrimeCarDeals.Controllers
             return View(requests);
         }
 
+
         // Action to show request details and approve (synchronous version)
         public IActionResult Details(int id)
         {
@@ -38,10 +36,25 @@ namespace PrimeCarDeals.Controllers
             {
                 return NotFound();
             }
-
+            ViewBag.FrontImage = request.Sell.FrontImage;
+            ViewBag.RearImage = request.Sell.RearImage;
+            ViewBag.LeftImage = request.Sell.LeftImage;
+            ViewBag.RightImage = request.Sell.RightImage;
             return View(request);
         }
 
+        public IActionResult Reject(int id)
+        {
+            var request = _context.Requests.Find(id);
+            if (request == null)
+            {
+                return NotFound();
+            }
+            request.status = "Rejected";
+            _context.Update(request);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
         // Action to approve a request and change its status 
         [HttpPost]
         public IActionResult Approve(int id)
@@ -57,19 +70,25 @@ namespace PrimeCarDeals.Controllers
             _context.Update(request);
             _context.SaveChanges();
 
-            
-            //var user=UserManager
+
+            Sell sellDetails = _context.Sells.FirstOrDefault(i => i.SellId == request.Sellid);
             CarDetails carDetails = new CarDetails();
-            carDetails.UserId = request.Userid;
-            carDetails.CarName = request.Carname;
-            carDetails.OwnerName = request.Sellername;
-            carDetails.Price = request.Price;
-            carDetails.Kilometers = request.Sell.Kilometers;
-            carDetails.Year = request.Sell.Year;
-            carDetails.Variant= request.Sell.Variant;
-            carDetails.City = request.Sell.City;
-            carDetails.address = request.Sell.Address;
-            
+            carDetails.CarName = sellDetails.CarName;
+            carDetails.address = sellDetails.Address;
+            carDetails.Year = sellDetails.Year;
+            carDetails.UserId = sellDetails.UserId;
+            carDetails.Kilometers = sellDetails.Kilometers;
+            carDetails.OwnerName = sellDetails.OwnerName;
+            carDetails.Price = sellDetails.Price;
+            carDetails.City = sellDetails.City;
+            carDetails.Variant = sellDetails.Variant;
+            carDetails.FuelType = sellDetails.FuelType;
+            carDetails.Transmission = sellDetails.Transmission;
+            carDetails.VehicleType = sellDetails.VehicleType;
+            carDetails.FrontImage = sellDetails.FrontImage;
+            carDetails.RearImage = sellDetails.RearImage;
+            carDetails.LeftImage = sellDetails.LeftImage;
+            carDetails.RightImage = sellDetails.RightImage;
             _context.CarDetails.Add(carDetails);
             _context.SaveChanges();
 

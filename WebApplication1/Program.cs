@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,27 @@ builder.Services.AddIdentity<UserRegistration, IdentityRole>(options =>
 .AddEntityFrameworkStores<WebApplication1Context>()
 .AddDefaultTokenProviders();
 builder.Services.AddTransient<EmailService>();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
+    options.Cookie.HttpOnly = true; // Secure cookies
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Use secure cookies on HTTPS
+});
+
+// Cookie Authentication Configuration
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            options.SlidingExpiration = true;
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Set expiration for the cookie
+            options.Cookie.IsEssential = true; // Make the cookie essential for the application
+            options.Cookie.MaxAge = TimeSpan.FromMinutes(30); // This will ensure the cookie expires after 30 minutes of inactivity
+            options.ReturnUrlParameter = "returnUrl";
+        });
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -37,9 +59,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseSession();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
