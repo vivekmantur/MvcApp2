@@ -1,27 +1,13 @@
-﻿@* @model WebApplication1.ViewModel.UserViewModel
-
-<h2>Profile for @Model.UserName</h2>
-
-<p>Email: @Model.Email</p>
-<p>Name: @Model.UserName</p>
-<p>Address: @Model.Address</p>
-<p>Phone Number: @Model.PhoneNumber</p>
-
-<!-- Link to Edit Profile page -->
-<a class="btn btn-primary" href="@Url.Action("EditProfile", "Account")">Edit Profile</a>
-<a class="btn btn-secondary" href="@Url.Action("ChangePassword", "Account")">Change Password</a>
- *@
- @model WebApplication1.ViewModel.UserViewModel
+﻿@model WebApplication1.ViewModel.UserViewModel
 
 <div class="container py-5">
-
     <div class="d-flex justify-content-center">
         <!-- Profile Card -->
         <div class="card text-dark" style="width: 18rem;">
             <div class="d-flex justify-content-end p-3">
                 <i class="fas fa-edit text-muted"></i>
             </div>
-   
+
             <div class="card-body">
                 <!-- Display Profile Information -->
                 <p><strong>Email:</strong> @Model.Email</p>
@@ -36,9 +22,64 @@
                 </div>
             </div>
         </div>
+
+        <!-- Recent Buys -->
+        <div class="card text-dark" style="width: 18rem;">
+            <div class="d-flex justify-content-end p-3">
+                <i class="fas fa-shopping-cart text-muted"></i>
+            </div>
+
+            <div class="card-body">
+                <h5>Recent Buys</h5>
+                @if (ViewBag.carbuys != null)
+                {
+                    <ul>
+                        @foreach (var payment in ViewBag.carbuys)
+                        {
+                            <li>
+                                <strong>Car ID:</strong> @payment.CarId <br />
+                                <strong>Amount:</strong> @payment.AmountPaid <br />
+                                <strong>Car Name:</strong> @payment.CarName
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No recent buys found.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Recent Sold Cars -->
+        <div class="card text-dark" style="width: 18rem;">
+            <div class="d-flex justify-content-end p-3">
+                <i class="fas fa-car text-muted"></i>
+            </div>
+
+            <div class="card-body">
+                <h5>Recent Sold Cars</h5>
+                @if (ViewBag.carsold != null )
+                {
+                    <ul>
+                        @foreach (var car in ViewBag.carsold)
+                        {
+                            <li>
+                                <strong>Car Name:</strong> @car.CarName <br />
+                                <strong>Buyer:</strong> @car.BuyerName <br />
+                                <strong>Price:</strong> @car.Price
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No recent sold cars found.</p>
+                }
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Bootstrap 5 JS (No Popper.js required) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-

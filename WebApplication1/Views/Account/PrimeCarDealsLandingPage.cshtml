@@ -1,0 +1,70 @@
+﻿@model IEnumerable<WebApplication1.Models.CarDetails>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "PrimeCarDeals - Home";
+}
+
+<section class="hero-section position-relative" style="background-image: url('https://storage.googleapis.com/a1aa/image/9bdDrGV6WxrtOx8Ff0SAjzJJrp42aKLGLfLcmullnPkqReinA.jpg'); background-size: cover; background-position: center; height: 60vh;">
+    <!-- Overlay to improve text readability -->
+    <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50">
+        <div class="text-center text-white">
+            <h1 class="display-4 font-weight-bold mb-4">Discover unbeatable deals on used cars at PrimeCarDeals.</h1>
+            <button class="btn btn-primary btn-lg">Know More</button>
+        </div>
+    </div>
+</section>
+
+<!-- Cars For Sale Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center section-title mb-5">Cars For Sale</h2>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+            @foreach (var car in Model)
+            {
+                <div class="col">
+                    <div class="card car-card h-100">
+                        <!-- Ensuring full image is displayed and no cropping -->
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(car.FrontImage)" class="card-img-top" alt="@car.CarName" style="object-fit: contain; height: 250px; width: 100%; margin: auto;">
+                        <div class="card-body car-card-body text-center d-flex flex-column">
+                            <h5 class="card-title font-weight-bold">@car.CarName</h5>
+                            <p class="text-primary">₹@car.Price.ToString("N0")</p>
+                            <p class="card-text">@car.CarName - @car.Year</p>
+                            <!-- Replace button with anchor link -->
+                            <a href="@Url.Action("Login", "Account")" class="btn btn-primary-custom mt-auto">Know More</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+<!-- Car Categories Section (This can be removed if you no longer want to display categories) -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center section-title mb-5">Car Categories</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col">
+                <div class="card car-category-card text-center">
+                    <h3>SUV</h3>
+                    <p>@Model.Count(car => car.VehicleType == "SUV")</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card car-category-card text-center">
+                    <h3>SEDAN</h3>
+                    <p>@Model.Count(car => car.VehicleType == "Sedan")</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card car-category-card text-center">
+                    <h3>HATCHBACK</h3>
+                    <p>@Model.Count(car => car.VehicleType == "Hatchback")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

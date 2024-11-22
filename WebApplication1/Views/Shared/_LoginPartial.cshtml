@@ -5,37 +5,83 @@
 @if (SignInManager.IsSignedIn(User) && User.IsInRole("User"))
 {
     var user = await UserManager.GetUserAsync(User);
-    <!-- User logged in, show profile and logout options -->
+    <!-- User logged in, show profile and logout options in a dropdown under the power icon -->
     <div class="d-flex align-items-center">
-        @*         <span class="mr-3">Hello, @User.Identity.Name!</span>
-    *@        <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Dashboard">Home</a>
-        <a class="btn btn-link text-dark" asp-controller="account" asp-action="Dashboard">Buy</a>
-        <a class="btn btn-link text-dark" asp-controller="user" asp-action="Sell">Sell</a>
-        <a class="btn btn-link text-dark" asp-controller="account" asp-action="ViewProfile" asp-route-email="@user.Email">Profile</a>
-        <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Logout">Logout</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="User" asp-action="Dashboard">Buy</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="user" asp-action="Sell">Sell</a>
+
+        <!-- Dropdown for Profile and Logout -->
+        <div class="dropdown hover-dropdown">
+            <button class="btn btn-link text-dark border border-dark rounded-3 mx-2 dropdown-toggle hover-highlight" type="button" id="dropdownProfile" aria-expanded="false">
+                <i class="fas fa-power-off"></i> <!-- Power Icon -->
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownProfile">
+                <li><a class="dropdown-item" href="@Url.Action("ViewProfile", "Account", new { email = user.Email })">Profile</a></li>
+                <li><a class="dropdown-item" href="@Url.Action("Logout", "Account")">Logout</a></li>
+            </ul>
+        </div>
     </div>
 }
 else if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
 {
     var user = await UserManager.GetUserAsync(User);
     <div class="d-flex align-items-center">
-        @*         <span class="mr-3">Hello, @User.Identity.Name!</span>
-    *@
-        <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Dashboard">Home</a>
-        <a class="btn btn-link text-dark" asp-controller="Admin" asp-action="Index">Requests</a>
-        <a class="btn btn-link text-dark" asp-controller="Admin" asp-action="RequestApproved">Requests Approved</a>
-        <a class="btn btn-link text-dark" asp-controller="account" asp-action="ViewProfile" asp-route-email="@user.Email">Profile</a>
-        <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Logout">Logout</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="User" asp-action="Dashboard">Home</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="Admin" asp-action="Index">Requests</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="Admin" asp-action="RequestApproved">Requests Approved</a>
+
+        <!-- Dropdown for Profile and Logout -->
+        <div class="dropdown hover-dropdown">
+            <button class="btn btn-link text-dark border border-dark rounded-3 mx-2 dropdown-toggle hover-highlight" type="button" id="dropdownAdmin" aria-expanded="false">
+                <i class="fas fa-power-off"></i> <!-- Power Icon -->
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownAdmin">
+                <li><a class="dropdown-item" href="@Url.Action("ViewProfile", "Account", new { email = user.Email })">Profile</a></li>
+                <li><a class="dropdown-item" href="@Url.Action("Logout", "Account")">Logout</a></li>
+            </ul>
+        </div>
     </div>
 }
 else
 {
     <!-- User not logged in, show login, register, and about links -->
     <div class="d-flex justify-content-start align-items-center">
-        <a class="btn btn-link text-dark ml-3" asp-controller="home" asp-action="Index">Home</a>
-        <a class="btn btn-link text-dark" asp-controller="account" asp-action="Login">Login</a>
-        <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="Register">Sign Up</a>
-
-        <a class="btn btn-link text-dark ml-3" asp-controller="account" asp-action="About">About</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="home" asp-action="Index">Home</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="account" asp-action="Login">Login</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="account" asp-action="Register">Sign Up</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="account" asp-action="About">About</a>
     </div>
 }
+
+<!-- Add Custom CSS for Hover Effect -->
+<style>
+    /* Custom Hover Effect */
+    .hover-highlight:hover {
+        background-color: #007bff; /* Highlight color (blue) */
+        color: white; /* Change text color to white */
+        text-decoration: none; /* Remove underline */
+    }
+
+    /* Remove underline on all links */
+    .btn-link {
+        text-decoration: none !important;
+    }
+
+    /* Dropdown menu to show on hover */
+    .hover-dropdown:hover .dropdown-menu {
+        display: block;
+    }
+
+    /* Style Power Icon Dropdown */
+    .dropdown-toggle::after {
+        display: none; /* Remove the default dropdown indicator */
+    }
+
+    .dropdown-menu {
+        min-width: 200px; /* Make the dropdown menu wider if needed */
+    }
+</style>
+
+<!-- Include Bootstrap JS and Font Awesome for the power icon -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">

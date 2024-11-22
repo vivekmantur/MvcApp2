@@ -86,7 +86,7 @@
                                         <h5 class="card-title">@car.CarName</h5>
                                         <p class="card-text">@car.VehicleType - @car.Year</p>
                                         <p class="text-primary">@car.Price.ToString("C", new System.Globalization.CultureInfo("en-IN"))</p>
-                                        <a href="@Url.Action("CarDetails", "Account", new { id = car.CarId })" class="btn btn-primary">View Details</a>
+                                        <a href="@Url.Action("CarDetails", "User", new { id = car.CarId })" class="btn btn-primary">View Details</a>
                                     </div>
                                 </div>
                             </div>

@@ -1,0 +1,54 @@
+﻿
+<div class="payment-box">
+    <h3>Payment Successfull</h3>
+    <p>Payment ID: @ViewBag.PaymentId</p>
+    <p>Total Paid : @ViewBag.Total</p>
+
+</div>
+
+<!-- Add custom CSS for styling the box -->
+<style>
+    /* Specific styles for the payment box */
+    .payment-box {
+        background-color: white;
+        border: 2px solid #ddd;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        text-align: center;
+        width: 300px; /* Adjust the width as needed */
+        margin: auto;
+    }
+
+        /* Styling for the heading within the payment box */
+        .payment-box h3 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        /* Styling for the paragraphs inside the payment box */
+        .payment-box p {
+            margin: 5px 0;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        /* Styling for the button inside the payment box */
+        .payment-box .btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+            .payment-box .btn:hover {
+                background-color: #0056b3;
+            }
+
+</style>

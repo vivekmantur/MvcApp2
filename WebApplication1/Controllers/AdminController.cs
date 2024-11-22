@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Models;
 
 namespace PrimeCarDeals.Controllers
 {
+    [Authorize(Roles ="Admin")]
     public class AdminController : Controller
     {
         private readonly WebApplication1Context _context;

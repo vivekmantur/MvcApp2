@@ -10,6 +10,7 @@ using WebApplication1.ViewModel;
 
 namespace WebApplication1.Controllers
 {
+   
     public class AccountController : Controller
     {
         private readonly UserManager<UserRegistration> userManager;
@@ -85,13 +86,12 @@ namespace WebApplication1.Controllers
                     return View(model);
                 }
 
-                // Sign the user in. Don't use RememberMe for session persistence (it should expire when the browser is closed)
                 var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, true);
                 if (result.Succeeded)
                 {
                     if (ReturnUrl == null)
                     {
-                        return RedirectToAction("Dashboard");
+                        return RedirectToAction("Dashboard","User");
                     }
                     else
                     {
@@ -110,131 +110,135 @@ namespace WebApplication1.Controllers
 
         public IActionResult Logout()
         {
-            // Ensure the session is cleared when logging out
             signInManager.SignOutAsync().Wait();
 
-            // Clear session explicitly
             HttpContext.Session.Clear();
 
             return RedirectToAction("Login", "Account");
         }
-
-        public IActionResult Dashboard()
+        public IActionResult PrimeCarDealsLandingPage()
         {
             var unsoldCarList = context.CarDetails.ToList();
-
-            unsoldCarList = unsoldCarList.Where(i => i.Status == "unsold").ToList();
-
-            var model = new CarDashboardViewModel
-            {
-                Cars = unsoldCarList,  // Load only unsold cars
-                Filter = new CarFilterViewModel()  // Initialize an empty filter
-            };
-
-            return View(model);
+           // unsoldCarList = unsoldCarList.Where(i => i.Status == "sold").ToList();
+            return View(unsoldCarList);
         }
+        //public IActionResult Dashboard()
+        //{
+        //    var unsoldCarList = context.CarDetails.ToList();
 
-        // Action to filter cars based on the form submission
-        [HttpPost]
-        public IActionResult FilterCars(CarFilterViewModel filter)
-        {
-            var filteredCars = context.CarDetails.ToList();
+        //    unsoldCarList = unsoldCarList.Where(i => i.Status == "unsold").ToList();
 
-            if (!string.IsNullOrEmpty(filter.VehicleType))
-            {
-                filteredCars = filteredCars.Where(i => i.VehicleType == filter.VehicleType).ToList();
-            }
+        //    var model = new CarDashboardViewModel
+        //    {
+        //        Cars = unsoldCarList,  
+        //        Filter = new CarFilterViewModel()  
+        //    };
 
-            if (!string.IsNullOrEmpty(filter.Transmission))
-            {
-                filteredCars = filteredCars.Where(i => i.Transmission == filter.Transmission).ToList();
-            }
-            if (!string.IsNullOrEmpty(filter.FuelType))
-            {
-                filteredCars = filteredCars.Where(i => i.FuelType == filter.FuelType).ToList();
-            }
-            if (filter.Year.HasValue)
-            {
-                filteredCars = filteredCars.Where(i => i.Year == filter.Year).ToList();
-            }
-            if (filter.MinPrice.HasValue)
-            {
-                filteredCars = filteredCars.Where(i => i.Price >= filter.MinPrice).ToList();
-            }
-            if (filter.MaxPrice.HasValue)
-            {
-                filteredCars = filteredCars.Where(i => i.Price <= filter.MaxPrice).ToList();
-            }
-            var model = new CarDashboardViewModel
-            {
-                Cars = filteredCars ?? new List<CarDetails>(),  // Ensure Cars is always initialized
-                Filter = filter  // Pass the filter back to the view
-            };
+        //    return View(model);
+        //}
 
-            return View("Dashboard", model);  // Return the filtered results to the same view
-        }
+        //// Action to filter cars based on the form submission
+        //[HttpPost]
+        //public IActionResult FilterCars(CarFilterViewModel filter)
+        //{
+        //    var filteredCars = context.CarDetails.ToList();
+        //    filteredCars = filteredCars.Where(i => i.Status == "unsold").ToList();
+        //    if (!string.IsNullOrEmpty(filter.VehicleType))
+        //    {
+        //        filteredCars = filteredCars.Where(i => i.VehicleType == filter.VehicleType).ToList();
+        //    }
 
-        public IActionResult CarDetails(int id)
-        {
-            // Find the car by its ID
-            var car = context.CarDetails.FirstOrDefault(c => c.CarId == id);
-            if (car == null)
-            {
-                return NotFound();
-            }
-            return View(car);
-        }
+        //    if (!string.IsNullOrEmpty(filter.Transmission))
+        //    {
+        //        filteredCars = filteredCars.Where(i => i.Transmission == filter.Transmission).ToList();
+        //    }
+        //    if (!string.IsNullOrEmpty(filter.FuelType))
+        //    {
+        //        filteredCars = filteredCars.Where(i => i.FuelType == filter.FuelType).ToList();
+        //    }
+        //    if (filter.Year.HasValue)
+        //    {
+        //        filteredCars = filteredCars.Where(i => i.Year == filter.Year).ToList();
+        //    }
+        //    if (filter.MinPrice.HasValue)
+        //    {
+        //        filteredCars = filteredCars.Where(i => i.Price >= filter.MinPrice).ToList();
+        //    }
+        //    if (filter.MaxPrice.HasValue)
+        //    {
+        //        filteredCars = filteredCars.Where(i => i.Price <= filter.MaxPrice).ToList();
+        //    }
+        //    var model = new CarDashboardViewModel
+        //    {
+        //        Cars = filteredCars ?? new List<CarDetails>(),  
+        //        Filter = filter  
+        //    };
 
-        public IActionResult Book(int id)
-        {
-            var CarDetails = context.CarDetails.FirstOrDefault(i => i.CarId == id);
-            return View(CarDetails);
-        }
+        //    return View("Dashboard", model);  
+        //}
 
         
-        public IActionResult MakePayment(int id)
-        {
+        //public IActionResult CarDetails(int id)
+        //{
+        //    // Finding the car by its ID
+        //    var car = context.CarDetails.FirstOrDefault(c => c.CarId == id);
+        //    if (car == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(car);
+        //}
 
-            var carDetails = context.CarDetails.FirstOrDefault(i => i.CarId == id);
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var amount = carDetails.Price + 10000;
-            Payment payment = new Payment();
-            payment.CarName = carDetails.CarName;
-            payment.SellerName = carDetails.OwnerName;
-            payment.AmountPaid = amount;
-            payment.BuyyerId = userId;
-            payment.CarId = carDetails.CarId;
-
-            context.Payments.Add(payment);
-
-            carDetails.Status = "sold";
-            context.Update(carDetails);
-            context.SaveChanges();
-
-            //payment details of a particular car
-            var carPaymentId = context.Payments.FirstOrDefault(i => i.CarId == id);
-
-            //current login user details
-            var currentUser = context.Users.FirstOrDefault(i => i.Id == userId);
-            CarsSold carsSold = new CarsSold();
-            carsSold.CarId = carDetails.CarId;
-            carsSold.PaymentId = carPaymentId.PaymentId;
-            carsSold.UserId = carDetails.UserId;
-            carsSold.CarName = carDetails.CarName;
-            carsSold.BuyerName = currentUser.UserName;
-            carsSold.CarType = carDetails.VehicleType;
-            carsSold.Price = carDetails.Price;
-            carsSold.SellerName = carDetails.OwnerName;
-            context.CarsSold.Add(carsSold);
-            context.SaveChanges();
+        //public IActionResult Book(int id)
+        //{
+        //    var CarDetails = context.CarDetails.FirstOrDefault(i => i.CarId == id);
+        //    return View(CarDetails);
+        //}
 
 
-            ViewBag.Total = payment.AmountPaid;
-            ViewBag.PaymentId = payment.PaymentId;
-            return View();
+        //public IActionResult MakePayment(int id)
+        //{
+
+        //    var carDetails = context.CarDetails.FirstOrDefault(i => i.CarId == id);
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    var amount = carDetails.Price + 10000;
+        //    Payment payment = new Payment();
+        //    payment.CarName = carDetails.CarName;
+        //    payment.SellerName = carDetails.OwnerName;
+        //    payment.AmountPaid = amount;
+        //    payment.BuyyerId = userId;
+        //    payment.CarId = carDetails.CarId;
+
+        //    context.Payments.Add(payment);
+
+        //    carDetails.Status = "sold";
+        //    context.Update(carDetails);
+        //    context.SaveChanges();
+
+        //    //payment details of a particular car
+        //    var carPaymentId = context.Payments.FirstOrDefault(i => i.CarId == id);
+
+        //    //current login user details
+        //    var currentUser = context.Users.FirstOrDefault(i => i.Id == userId);
+        //    CarsSold carsSold = new CarsSold();
+        //    carsSold.CarId = carDetails.CarId;
+        //    carsSold.PaymentId = carPaymentId.PaymentId;
+        //    carsSold.UserId = carDetails.UserId;
+        //    carsSold.CarName = carDetails.CarName;
+        //    carsSold.BuyerName = currentUser.UserName;
+        //    carsSold.CarType = carDetails.VehicleType;
+        //    carsSold.Price = carDetails.Price;
+        //    carsSold.SellerName = carDetails.OwnerName;
+        //    context.CarsSold.Add(carsSold);
+        //    context.SaveChanges();
+
+
+        //    ViewBag.Total = payment.AmountPaid;
+        //    ViewBag.PaymentId = payment.PaymentId;
+        //    return View();
             
 
-        }
+        //}
 
         // ViewProfile GET Action (Synchronous version)
         [HttpGet]
@@ -248,6 +252,14 @@ namespace WebApplication1.Controllers
                 return NotFound();
             }
 
+            //getting any payments for cars buyed for user
+            var payments=context.Payments.ToList();
+            payments = payments.Where(i => i.BuyyerId == user.Id).ToList();
+
+            //getting details of cars if user has sold recently
+            var carsSold=context.CarsSold.ToList();
+            carsSold=carsSold.Where(i=>i.UserId == user.Id).ToList();
+
             // Map the user's data to the ViewModel
             var userModel = new UserViewModel
             {
@@ -257,7 +269,9 @@ namespace WebApplication1.Controllers
                 Address = user.Address,
             };
 
+            ViewBag.carbuys=payments;
 
+            ViewBag.carsold=carsSold;
 
             return View(userModel);
         }
