@@ -62,6 +62,8 @@ namespace WebApplication1.Models
         public byte[] LeftImage { get; set; }
         [Required]
         public byte[] RightImage { get; set; }
+
+        public byte[] Documents { get; set; }
         public UserRegistration User { get; set; }
 
         public Requests Requests { get; set; }

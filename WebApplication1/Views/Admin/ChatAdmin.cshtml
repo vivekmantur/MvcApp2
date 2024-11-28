@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Admin Chat";
+}
+<h2>Chat with User</h2>
+
+<div id="chat-container">
+    <ul id="messagesList"></ul>
+    <input type="text" id="messageInput" placeholder="Type a message..." />
+    <button id="sendMessageButton">Send</button>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/microsoft/signalr@5.0.12/dist/browser/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chathub")
+            .build();
+
+        connection.on("ReceiveMessage", function (user, message) {
+            const msg = `${user}: ${message}`;
+            const li = document.createElement("li");
+            li.textContent = msg;
+            document.getElementById("messagesList").appendChild(li);
+        });
+
+        connection.start().then(function () {
+            // Admin joins "admin" group to listen to all user messages
+            connection.invoke("JoinAdminGroup", "admin");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        document.getElementById("sendMessageButton").addEventListener("click", function () {
+            const message = document.getElementById("messageInput").value;
+            connection.invoke("SendMessage", "Admin", message).catch(function (err) {
+                return console.error(err.toString());
+            });
+        });
+    </script>
+}

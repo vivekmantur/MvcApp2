@@ -23,12 +23,41 @@ namespace WebApplication1.Controllers
             this.context = context;
             this.signInManager = signInManager;
         }
+        public void UpdateLastActivityTime()
+        {
+            HttpContext.Session.SetString("LastActivity", DateTime.UtcNow.ToString());
+        }
+        public IActionResult CheckUserInactivity()
+        {
+            var lastActivity = HttpContext.Session.GetString("LastActivity");
+            if (lastActivity != null)
+            {
+                DateTime lastActivityTime = DateTime.Parse(lastActivity);
+                if (DateTime.UtcNow.Subtract(lastActivityTime).TotalMinutes > 2)
+                {
+                    // User is inactive for more than 10 minutes, log them out
+                    signInManager.SignOutAsync().Wait();
+                    HttpContext.Session.Clear();
+                    return RedirectToAction("Login", "Account");
+                }
+            }
+
+            // Update the last activity time
+            UpdateLastActivityTime();
+            return null; // No inactivity detected, continue with the request
+        }
+
         public IActionResult Index()
         {
             return View();
         }
         public IActionResult Sell()
         {
+            var inactivityCheckResult = CheckUserInactivity();
+            if (inactivityCheckResult != null)
+            {
+                return inactivityCheckResult; // If user is inactive, they'll be redirected to login
+            }
             return View();
         }
         /// <summary>
@@ -62,7 +91,8 @@ namespace WebApplication1.Controllers
                     LeftImage = ConvertFileToByteArray(sell.LeftImage),
                     RightImage = ConvertFileToByteArray(sell.RightImage),
                     RearImage = ConvertFileToByteArray(sell.RearImage),
-                    FrontImage = ConvertFileToByteArray(sell.FrontImage)
+                    FrontImage = ConvertFileToByteArray(sell.FrontImage),
+                    Documents=ConvertFileToByteArray(sell.Documents)
                 };
 
                 context.Sells.Add(newSell);
@@ -103,6 +133,12 @@ namespace WebApplication1.Controllers
 
         public IActionResult Dashboard()
         {
+
+            var inactivityCheckResult = CheckUserInactivity();
+            if (inactivityCheckResult != null)
+            {
+                return inactivityCheckResult; // If user is inactive, they'll be redirected to login
+            }
             var unsoldCarList = context.CarDetails.ToList();
 
             unsoldCarList = unsoldCarList.Where(i => i.Status == "unsold").ToList();
@@ -168,6 +204,11 @@ namespace WebApplication1.Controllers
 
         public IActionResult Book(int id)
         {
+            var inactivityCheckResult = CheckUserInactivity();
+            if (inactivityCheckResult != null)
+            {
+                return inactivityCheckResult; // If user is inactive, they'll be redirected to login
+            }
             var CarDetails = context.CarDetails.FirstOrDefault(i => i.CarId == id);
             return View(CarDetails);
         }
@@ -214,7 +255,18 @@ namespace WebApplication1.Controllers
             ViewBag.PaymentId = payment.PaymentId;
             return View();
 
+        }
+        public IActionResult Chat()
+        {
+            return View();
+        }
 
+        public IActionResult CarStatus()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var requests=context.Requests.ToList();
+            requests=requests.Where(i=>i.Userid== userId).ToList();
+            return View(requests);
         }
     }
 }

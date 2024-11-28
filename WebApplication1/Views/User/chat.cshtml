@@ -1,0 +1,53 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.SignalR
+
+@{
+    ViewData["Title"] = "Chat with Admin";
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+}
+
+<h2>Chat with Admin</h2>
+
+<div id="chat-container">
+    <ul id="messagesList"></ul>
+    <input type="text" id="messageInput" placeholder="Type a message..." />
+    <button id="sendMessageButton">Send</button>
+</div>
+
+@section Scripts {
+    <!-- Add SignalR script reference -->
+    <script src="https://cdn.jsdelivr.net/npm/microsoft/signalr@5.0.12/dist/browser/signalr.min.js"></script>
+    <script>
+        // Establish a connection with the SignalR Hub
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chathub")
+            .build();
+
+        // Define how the client will handle incoming messages
+        connection.on("ReceiveMessage", function (user, message) {
+            const msg = `${user}: ${message}`;
+            const li = document.createElement("li");
+            li.textContent = msg;
+            document.getElementById("messagesList").appendChild(li);
+        });
+
+        // Start the connection to SignalR Hub and join the user group
+        connection.start().then(function () {
+            // Join the user group based on the userId
+            connection.invoke("JoinUserGroup", "@userId").catch(function (err) {
+                return console.error(err.toString());
+            });
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        // Send message from the user to admin
+        document.getElementById("sendMessageButton").addEventListener("click", function () {
+            const message = document.getElementById("messageInput").value;
+            // Send the message to admin
+            connection.invoke("SendMessageToAdmin", "@User.Identity.Name", message).catch(function (err) {
+                return console.error(err.toString());
+            });
+        });
+    </script>
+}

@@ -1,166 +1,28 @@
-﻿@{
-    Layout = "_Layout";  // This uses the _Layout.cshtml (your existing layout with header and footer)
-    ViewData["Title"] = "PrimeCarDeals - Home";
-}
-
-<section class="hero-section position-relative" style="background-image: url('https://storage.googleapis.com/a1aa/image/9bdDrGV6WxrtOx8Ff0SAjzJJrp42aKLGLfLcmullnPkqReinA.jpg'); background-size: cover; background-position: center; height: 60vh;">
-    <!-- Overlay to improve text readability -->
-    <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50">
-        <div class="text-center text-white">
-            <h1 class="display-4 font-weight-bold mb-4">Discover unbeatable deals on used cars at PrimeCarDeals.</h1>
-            <button class="btn btn-primary btn-lg">Know More</button>
+﻿@page
+<div class="container">
+    <div class="row p-1">
+        <div class="col-1">User</div>
+        <div class="col-5"><input type="text" id="userInput" /></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-1">Message</div>
+        <div class="col-5"><input type="text" class="w-100" id="messageInput" /></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6 text-end">
+            <input type="button" id="sendButton" value="Send Message" />
         </div>
     </div>
-</section>
-
-<!-- Cars For Sale Section -->
-<section class="py-5">
-    <div class="container">
-        <h2 class="text-center section-title mb-5">Cars For Sale</h2>
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            <!-- Car 1: Brezza 2019 Diesel -->
-            <div class="col">
-                <div class="card car-card">
-                    <img src="https://storage.googleapis.com/a1aa/image/4dE0xyBJx0ooBVxjA4pTEb3kJefXde7pt0MbMgmfw8AjG5FPB.jpg" class="card-img-top" alt="Brezza 2019 Diesel">
-                    <div class="card-body car-card-body text-center">
-                        <h5 class="card-title font-weight-bold">Brezza 2019 Diesel</h5>
-                        <p class="text-primary">₹12.5 Lakh</p>
-                        <p class="card-text">A compact SUV with excellent fuel economy and a stylish design.</p>
-                        <button class="btn btn-primary-custom">Know More</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Car 2: Creta 2018 Diesel -->
-            <div class="col">
-                <div class="card car-card">
-                    <img src="https://storage.googleapis.com/a1aa/image/zoM7ve085kSEKKNU0rCX2Tzlf6Ua3cZRPzc45kTcj2ltReinA.jpg" class="card-img-top" alt="Creta 2018 Diesel">
-                    <div class="card-body car-card-body text-center">
-                        <h5 class="card-title font-weight-bold">Creta 2018 Diesel</h5>
-                        <p class="text-primary">₹16.5 Lakh</p>
-                        <p class="card-text">Stylish and spacious SUV with a 1.6L diesel engine. Perfect for road trips.</p>
-                        <button class="btn btn-primary-custom">Know More</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Car 3: Wagonar 2013 Petrol -->
-            <div class="col">
-                <div class="card car-card">
-                    <img src="https://storage.googleapis.com/a1aa/image/f09VQtEAUcQkQarN6BelCPBeYixEqTKqKHGqoXocHSwPj8inA.jpg" class="card-img-top" alt="Wagonar 2013 Petrol">
-                    <div class="card-body car-card-body text-center">
-                        <h5 class="card-title font-weight-bold">Wagonar 2013 Petrol</h5>
-                        <p class="text-primary">₹4.5 Lakh</p>
-                        <p class="card-text">A reliable and compact hatchback with great fuel efficiency.</p>
-                        <button class="btn btn-primary-custom">Know More</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Car 4: Verna 2018 Diesel -->
-            <div class="col">
-                <div class="card car-card">
-                    <img src="https://storage.googleapis.com/a1aa/image/OoXdNfhrBrwTNi8rxRsxuPDvj7DN3kpYXiaUQx5SHAJ3Iv4JA.jpg" class="card-img-top" alt="Verna 2018 Diesel">
-                    <div class="card-body car-card-body text-center">
-                        <h5 class="card-title font-weight-bold">Verna 2018 Diesel</h5>
-                        <p class="text-primary">₹16.5 Lakh</p>
-                        <p class="card-text">A premium sedan with a 1.6L diesel engine, offering both luxury and performance.</p>
-                        <button class="btn btn-primary-custom">Know More</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Car 5: Creta 2017 Petrol -->
-            <div class="col">
-                <div class="card car-card">
-                    <img src="https://storage.googleapis.com/a1aa/image/NYQthpbqSaplLhvtWNmJsQhEzBPdmhGmYoaklCuKxs2akX8E.jpg" class="card-img-top" alt="Creta 2017 Petrol">
-                    <div class="card-body car-card-body text-center">
-                        <h5 class="card-title font-weight-bold">Creta 2017 Petrol</h5>
-                        <p class="text-primary">₹14.5 Lakh</p>
-                        <p class="card-text">A compact SUV with premium features and a smooth petrol engine.</p>
-                        <button class="btn btn-primary-custom">Know More</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Car 6: i10 2015 Petrol -->
-            <div class="col">
-                <div class="card car-card">
-                    <img src="https://storage.googleapis.com/a1aa/image/dUvPstIe7NwALapRQi0RfcmX7mbzYgG9aiahcg6e3EnZj8inA.jpg" class="card-img-top" alt="i10 2015 Petrol">
-                    <div class="card-body car-card-body text-center">
-                        <h5 class="card-title font-weight-bold">i10 2015 Petrol</h5>
-                        <p class="text-primary">₹5.5 Lakh</p>
-                        <p class="card-text">A compact city car with low maintenance and excellent fuel efficiency.</p>
-                        <button class="btn btn-primary-custom">Know More</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Car 7: Swift 2016 Petrol -->
-            <div class="col">
-                <div class="card car-card">
-                    <img src="https://storage.googleapis.com/a1aa/image/7QzN2pvYrhI6NxuxO8P9T7FX5IZ26tEN9aHrl72xaUwp6XPmbA.jpg" class="card-img-top" alt="Swift 2016 Petrol">
-                    <div class="card-body car-card-body text-center">
-                        <h5 class="card-title font-weight-bold">Swift 2016 Petrol</h5>
-                        <p class="text-primary">₹6.5 Lakh</p>
-                        <p class="card-text">A fun-to-drive hatchback with sporty styling and great handling.</p>
-                        <button class="btn btn-primary-custom">Know More</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Car 8: Altroz 2020 Diesel -->
-            <div class="col">
-                <div class="card car-card">
-                    <img src="https://storage.googleapis.com/a1aa/image/3vMlVj7cpEAtmj5wR0APowJx45AwUp27SHY7cfDrASstAWk7gA.jpg" class="card-img-top" alt="Altroz 2020 Diesel">
-                    <div class="card-body car-card-body text-center">
-                        <h5 class="card-title font-weight-bold">Altroz 2020 Diesel</h5>
-                        <p class="text-primary">₹8.5 Lakh</p>
-                        <p class="card-text">A premium hatchback with a spacious cabin and powerful diesel engine.</p>
-                        <button class="btn btn-primary-custom">Know More</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Car 9: Baleno 2021 Petrol -->
-            <div class="col">
-                <div class="card car-card">
-                    <img src="https://storage.googleapis.com/a1aa/image/1mGZm47VnKTAqS2SMnq43z5gAwHJ3wnrLg1i5i3KREShcFj6xA.jpg" class="card-img-top" alt="Baleno 2021 Petrol">
-                    <div class="card-body car-card-body text-center">
-                        <h5 class="card-title font-weight-bold">Baleno 2021 Petrol</h5>
-                        <p class="text-primary">₹10.5 Lakh</p>
-                        <p class="card-text">A modern hatchback with a stylish design, offering great mileage.</p>
-                        <button class="btn btn-primary-custom">Know More</button>
-                    </div>
-                </div>
-            </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <hr />
         </div>
     </div>
-</section>
-
-<!-- Car Categories Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <h2 class="text-center section-title mb-5">Car Sold</h2>
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            <div class="col">
-                <div class="card car-category-card text-center">
-                    <h3>SUV</h3>
-                    <p>21</p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card car-category-card text-center">
-                    <h3>SEDAN</h3>
-                    <p>17</p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card car-category-card text-center">
-                    <h3>HATCHBACK</h3>
-                    <p>40</p>
-                </div>
-            </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <ul id="messagesList"></ul>
         </div>
     </div>
-</section>
+</div>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>

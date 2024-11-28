@@ -41,12 +41,37 @@
                 <div class="form-group text-center mb-3">
                     <button type="submit" class="btn btn-success w-100">Login</button>
                 </div>
-
+                
                 <!-- Register Link -->
                 <div class="text-center">
                     <p>Don't have an account? <a asp-action="Register" asp-controller="Account">Click to Register</a></p>
                 </div>
             </div>
         </form>
+        <div class="col-md-6">
+            <h1>External Login</h1>
+            <hr />
+            @{
+                if (Model.ExternalLogins == null || !Model.ExternalLogins.Any())
+                {
+                    <div>No external logins configured</div>
+                }
+                else
+                {
+                    <form method="post" asp-controller="Account" asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+                        <div>
+                            @foreach (var provider in Model.ExternalLogins)
+                            {
+                                <button type="submit" class="btn btn-primary"
+                                        name="provider" value="@provider.Name"
+                                        title="Log in using your @provider.DisplayName account">
+                                    @provider.DisplayName
+                                </button>
+                            }
+                        </div>
+                    </form>
+                }
+            }
+        </div>
     </div>
 </div>

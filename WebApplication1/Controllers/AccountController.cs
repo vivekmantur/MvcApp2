@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -59,10 +60,14 @@ namespace WebApplication1.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Login(String? ReturnUrl)
+        public async Task<IActionResult> Login(String? ReturnUrl)
         {
             ViewBag.ReturnUrl = ReturnUrl;
-            UserLogin model = new UserLogin();
+            UserLogin model = new UserLogin
+            { 
+                ReturnUrl = ReturnUrl,
+                ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync())
+            };
             return View(model);
         }
 
@@ -72,7 +77,8 @@ namespace WebApplication1.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await userManager.FindByEmailAsync(model.Email);
+                UserRegistration user = await userManager.FindByEmailAsync(model.Email);
+
                 if (user == null)
                 {
                     ModelState.AddModelError("message", "Invalid credentials");
@@ -80,6 +86,7 @@ namespace WebApplication1.Controllers
                 }
 
                 var passwordCheck = await userManager.CheckPasswordAsync(user, model.Password);
+                
                 if (!passwordCheck)
                 {
                     ModelState.AddModelError("message", "Invalid credentials");
@@ -106,141 +113,93 @@ namespace WebApplication1.Controllers
             }
             return View(model);
         }
+        
+        /// <summary>
+        /// action to login user with google
+        /// </summary>
+        /// <param name="provider">external provider </param>
+        /// <param name="returnUrl">return url input string</param>
+        /// <returns>External Login View</returns>
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult ExternalLogin(string provider, string returnUrl)
+        {
+            var redirectUrl = Url.Action(action: "ExternalLoginCallback", controller: "Account", values: new { ReturnUrl = returnUrl });
 
+            // Configure external authentication properties
+            var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            //to get the account selection screen
+            properties.Items["prompt"] = "select_account";
+
+            // This will redirect the user to the external provider's login page
+            return new ChallengeResult(provider, properties);
+        }
+        /// <summary>
+        /// Login functionality by verifying user email
+        /// </summary>
+        /// <param name="returnUrl">return url</param>
+        /// <param name="remoteError">authenti</param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback(string? returnUrl, string? remoteError)
+        {
+            returnUrl = returnUrl ?? Url.Content("~/");
+
+            UserLogin loginViewModel = new UserLogin
+            {
+                ReturnUrl = returnUrl,
+                ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync())?.ToList() ?? new List<AuthenticationScheme>()
+            };
+            if(remoteError != null)
+            {
+                ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
+                return View("Login", loginViewModel);
+            }
+
+            // Get the login information about the user from the external login provider
+            var info = await signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                ModelState.AddModelError(string.Empty, "Error loading external login information.");
+                return View("Login", loginViewModel);
+            }
+
+            // If the user already has a login (i.e., if there is a record in AspNetUserLogins table)
+            var signInResult = await signInManager.ExternalLoginSignInAsync(info.LoginProvider,
+                info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+            if (signInResult.Succeeded)
+            {
+                return LocalRedirect(returnUrl);
+            }
+            else
+            {
+                //If there is no user record in AspNetUsers Table then he should redirect to Register Table
+                // Get the email claim value from the external login info
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                if (email != null)
+                {
+                    // The user is not found, show an error and redirect to registration.
+                    return RedirectToAction("Register", "Account");
+                }
+                return View("Error");
+            }
+        }
 
         public IActionResult Logout()
         {
             signInManager.SignOutAsync().Wait();
-
             HttpContext.Session.Clear();
-
             return RedirectToAction("Login", "Account");
         }
         public IActionResult PrimeCarDealsLandingPage()
         {
             var unsoldCarList = context.CarDetails.ToList();
-           // unsoldCarList = unsoldCarList.Where(i => i.Status == "sold").ToList();
+           unsoldCarList = unsoldCarList.Where(i => i.Status == "sold").ToList();
             return View(unsoldCarList);
         }
-        //public IActionResult Dashboard()
-        //{
-        //    var unsoldCarList = context.CarDetails.ToList();
-
-        //    unsoldCarList = unsoldCarList.Where(i => i.Status == "unsold").ToList();
-
-        //    var model = new CarDashboardViewModel
-        //    {
-        //        Cars = unsoldCarList,  
-        //        Filter = new CarFilterViewModel()  
-        //    };
-
-        //    return View(model);
-        //}
-
-        //// Action to filter cars based on the form submission
-        //[HttpPost]
-        //public IActionResult FilterCars(CarFilterViewModel filter)
-        //{
-        //    var filteredCars = context.CarDetails.ToList();
-        //    filteredCars = filteredCars.Where(i => i.Status == "unsold").ToList();
-        //    if (!string.IsNullOrEmpty(filter.VehicleType))
-        //    {
-        //        filteredCars = filteredCars.Where(i => i.VehicleType == filter.VehicleType).ToList();
-        //    }
-
-        //    if (!string.IsNullOrEmpty(filter.Transmission))
-        //    {
-        //        filteredCars = filteredCars.Where(i => i.Transmission == filter.Transmission).ToList();
-        //    }
-        //    if (!string.IsNullOrEmpty(filter.FuelType))
-        //    {
-        //        filteredCars = filteredCars.Where(i => i.FuelType == filter.FuelType).ToList();
-        //    }
-        //    if (filter.Year.HasValue)
-        //    {
-        //        filteredCars = filteredCars.Where(i => i.Year == filter.Year).ToList();
-        //    }
-        //    if (filter.MinPrice.HasValue)
-        //    {
-        //        filteredCars = filteredCars.Where(i => i.Price >= filter.MinPrice).ToList();
-        //    }
-        //    if (filter.MaxPrice.HasValue)
-        //    {
-        //        filteredCars = filteredCars.Where(i => i.Price <= filter.MaxPrice).ToList();
-        //    }
-        //    var model = new CarDashboardViewModel
-        //    {
-        //        Cars = filteredCars ?? new List<CarDetails>(),  
-        //        Filter = filter  
-        //    };
-
-        //    return View("Dashboard", model);  
-        //}
-
         
-        //public IActionResult CarDetails(int id)
-        //{
-        //    // Finding the car by its ID
-        //    var car = context.CarDetails.FirstOrDefault(c => c.CarId == id);
-        //    if (car == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(car);
-        //}
 
-        //public IActionResult Book(int id)
-        //{
-        //    var CarDetails = context.CarDetails.FirstOrDefault(i => i.CarId == id);
-        //    return View(CarDetails);
-        //}
-
-
-        //public IActionResult MakePayment(int id)
-        //{
-
-        //    var carDetails = context.CarDetails.FirstOrDefault(i => i.CarId == id);
-        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //    var amount = carDetails.Price + 10000;
-        //    Payment payment = new Payment();
-        //    payment.CarName = carDetails.CarName;
-        //    payment.SellerName = carDetails.OwnerName;
-        //    payment.AmountPaid = amount;
-        //    payment.BuyyerId = userId;
-        //    payment.CarId = carDetails.CarId;
-
-        //    context.Payments.Add(payment);
-
-        //    carDetails.Status = "sold";
-        //    context.Update(carDetails);
-        //    context.SaveChanges();
-
-        //    //payment details of a particular car
-        //    var carPaymentId = context.Payments.FirstOrDefault(i => i.CarId == id);
-
-        //    //current login user details
-        //    var currentUser = context.Users.FirstOrDefault(i => i.Id == userId);
-        //    CarsSold carsSold = new CarsSold();
-        //    carsSold.CarId = carDetails.CarId;
-        //    carsSold.PaymentId = carPaymentId.PaymentId;
-        //    carsSold.UserId = carDetails.UserId;
-        //    carsSold.CarName = carDetails.CarName;
-        //    carsSold.BuyerName = currentUser.UserName;
-        //    carsSold.CarType = carDetails.VehicleType;
-        //    carsSold.Price = carDetails.Price;
-        //    carsSold.SellerName = carDetails.OwnerName;
-        //    context.CarsSold.Add(carsSold);
-        //    context.SaveChanges();
-
-
-        //    ViewBag.Total = payment.AmountPaid;
-        //    ViewBag.PaymentId = payment.PaymentId;
-        //    return View();
-            
-
-        //}
-
-        // ViewProfile GET Action (Synchronous version)
         [HttpGet]
         public IActionResult ViewProfile(string email)
         {
@@ -330,15 +289,12 @@ namespace WebApplication1.Controllers
                 }
                 else
                 {
-                    // If there are any errors, display them
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
                 }
             }
-
-            // If there were validation errors, redisplay the form with the model
             return View(model);
         }
 

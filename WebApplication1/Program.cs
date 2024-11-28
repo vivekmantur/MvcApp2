@@ -28,7 +28,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true; // Secure cookies
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Use secure cookies on HTTPS
 });
-
+builder.Services.AddSignalR();
 // Cookie Authentication Configuration
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>
@@ -44,7 +44,21 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddAuthentication()
+.AddGoogle(options =>
+{
+    options.ClientId = "198174372725-bc7vfgle3ko08m23djocgk397s82n8qe.apps.googleusercontent.com";
+    options.ClientSecret = "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";
+    options.CallbackPath = new PathString("/signin-google");
 
+    // You can set other options as needed.
+});
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
+    options.Cookie.HttpOnly = true; // Makes session cookie HttpOnly for security
+    options.Cookie.IsEssential = true; // Essential cookie for sessions
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

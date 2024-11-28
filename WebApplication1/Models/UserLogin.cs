@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authentication;
 
 namespace WebApplication1.Models
 {
@@ -14,5 +15,10 @@ namespace WebApplication1.Models
 
         [Display(Name = "Remember me")]
         public bool RememberMe { get; set; }
+
+        public string? ReturnUrl { get; set; }
+
+        
+        public IEnumerable<AuthenticationScheme>? ExternalLogins { get; set; }
     }
 }

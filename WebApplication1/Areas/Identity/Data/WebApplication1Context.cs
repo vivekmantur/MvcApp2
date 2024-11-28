@@ -19,6 +19,8 @@ public class WebApplication1Context : IdentityDbContext<UserRegistration>
     public DbSet<CarsSold> CarsSold { get; set; }
 
     public DbSet<Payment> Payments { get; set; }
+
+    public DbSet<VerificationAppointment> VerificationAppointments { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

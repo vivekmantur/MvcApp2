@@ -24,7 +24,13 @@
         <p><strong>Brand:</strong> @Model.Sell.Brand</p>
         <p><strong>City:</strong> @Model.Sell.City</p>
     </div>
-
+    @if (Model.Sell.Documents != null && Model.Sell.Documents.Length > 0)
+    {
+        <h3>RC Document</h3>
+        <div class="rc-pdf-download">
+            <a href="@Url.Action("DownloadPdf", "Admin", new { id = Model.RequestId })" class="btn btn-secondary">Download Documents PDF</a>
+        </div>
+    }
     <h3>Car Image</h3>
     <div class="car-image-box">
         @{

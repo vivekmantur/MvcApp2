@@ -13,7 +13,6 @@ namespace WebApplication1.Models
 
         public string Sellername { get; set; }
 
-
         public string Carname { get; set; }
 
         public decimal Price { get; set; }
@@ -21,6 +20,8 @@ namespace WebApplication1.Models
         public string status { get; set; } = "Pending";
 
         public Sell Sell { get; set; }
+
+        public VerificationAppointment VerificationAppointment { get; set; }
 
     }
 }

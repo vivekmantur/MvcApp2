@@ -58,5 +58,8 @@ namespace WebApplication1.ViewModel
         public IFormFile LeftImage { get; set; }
         [Required]
         public IFormFile RightImage { get; set; }
+
+        [Required]
+        public IFormFile Documents {  get; set; } 
     }
 }

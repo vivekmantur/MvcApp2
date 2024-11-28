@@ -9,6 +9,8 @@
     <div class="d-flex align-items-center">
         <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="User" asp-action="Dashboard">Buy</a>
         <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="user" asp-action="Sell">Sell</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="user" asp-action="CarStatus">Car Status</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="user" asp-action="chat">Chat with admin</a>
 
         <!-- Dropdown for Profile and Logout -->
         <div class="dropdown hover-dropdown">
@@ -29,6 +31,7 @@ else if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
         <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="User" asp-action="Dashboard">Home</a>
         <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="Admin" asp-action="Index">Requests</a>
         <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="Admin" asp-action="RequestApproved">Requests Approved</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="Admin" asp-action="GetVerificationPending">Verification Pending</a>
 
         <!-- Dropdown for Profile and Logout -->
         <div class="dropdown hover-dropdown">
