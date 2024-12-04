@@ -17,7 +17,7 @@ namespace WebApplication1.Models
 
         public decimal Price { get; set; }
 
-        public string status { get; set; } = "Pending";
+        public RequestStatus status { get; set; } = RequestStatus.Pending;
 
         public Sell Sell { get; set; }
 

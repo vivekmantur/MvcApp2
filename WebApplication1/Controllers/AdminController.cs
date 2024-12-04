@@ -22,12 +22,16 @@ namespace PrimeCarDeals.Controllers
         public IActionResult Index()
         {
             var requests = _context.Requests
-                            .Where(r => r.status == "Pending")
+                            .Where(r => r.status == RequestStatus.Pending)
                             .Include(r => r.Sell)
                             .ToList();
             return View(requests);
         }
 
+        public void UpdateStatus<T>(T model) where T:class
+        {
+            var update = _context.Set<T>().Find();
+        }
       
         // Action to show request details and approve (synchronous version)
         public IActionResult Details(int id)
@@ -54,7 +58,7 @@ namespace PrimeCarDeals.Controllers
             {
                 return NotFound();
             }
-            request.status = "Rejected";
+            request.status = RequestStatus.Rejected;
             _context.Update(request);
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
@@ -70,7 +74,7 @@ namespace PrimeCarDeals.Controllers
                 return NotFound();
             }
 
-            request.status = "Under Verification";  // Update status to Approved
+            request.status = RequestStatus.UnderVerification;  // Update status to Approved
             _context.Update(request);
             _context.SaveChanges();
 
@@ -137,8 +141,8 @@ namespace PrimeCarDeals.Controllers
         public IActionResult ApproveVerification(int id)
         {
             VerificationAppointment? verifyCar = _context.VerificationAppointments.Include(d=>d.Request).FirstOrDefault(i => i.VerificationId == id);
-            verifyCar.Verified = "Verified";
-            verifyCar.Request.status = "Accepted";
+            verifyCar.Verified = VerificationStatus.Verified;
+            verifyCar.Request.status =  RequestStatus.Approved;
             _context.Attach(verifyCar.Request);
             _context.Update(verifyCar);
             _context.SaveChanges();
@@ -169,13 +173,13 @@ namespace PrimeCarDeals.Controllers
         public IActionResult GetVerificationPending()
         {
             List<VerificationAppointment> appointments = _context.VerificationAppointments.ToList();
-            appointments = appointments.Where(i => i.Verified == "Pending").ToList();
+            appointments = appointments.Where(i => i.Verified == VerificationStatus.Pending).ToList();
             return View(appointments);
         }
         public IActionResult RequestApproved()
         {
             var requests = _context.Requests
-                           .Where(r => r.status == "Approved")
+                           .Where(r => r.status == RequestStatus.Approved)
                            .Include(r => r.Sell)
                            .ToList();
             return View(requests);

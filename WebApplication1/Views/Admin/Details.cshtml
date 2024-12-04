@@ -45,7 +45,7 @@
         <img id="profilePicPreview" src="@imageSrc" alt="Car Image" class="car-image-preview" />
     </div>
 
-    @if (Model.status == "Pending")
+    @if (Model.status == RequestStatus.Pending)
     {
         <form method="post" action="@Url.Action("Approve", "Admin", new { id = Model.RequestId })">
             <button type="submit" class="btn btn-primary">Approve Request</button>

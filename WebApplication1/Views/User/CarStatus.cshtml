@@ -30,19 +30,19 @@
                                     <td>@request.Carname</td>
                                     <td>@request.Price.ToString("C")</td> <!-- Currency formatting -->
                                     <td>
-                                        @if (request.status == "Approved")
+                                        @if (request.status == RequestStatus.Approved)
                                         {
                                             <div class="status-card bg-success text-white p-2 rounded">
                                                 <i class="fas fa-check-circle"></i> Approved
                                             </div>
                                         }
-                                        else if (request.status == "Pending")
+                                        else if (request.status == RequestStatus.Pending)
                                         {
                                             <div class="status-card bg-warning text-dark p-2 rounded">
                                                 <i class="fas fa-hourglass-half"></i> Pending
                                             </div>
                                         }
-                                        else if (request.status == "Rejected")
+                                        else if (request.status == RequestStatus.Rejected)
                                         {
                                             <div class="status-card bg-danger text-white p-2 rounded">
                                                 <i class="fas fa-times-circle"></i> Rejected
