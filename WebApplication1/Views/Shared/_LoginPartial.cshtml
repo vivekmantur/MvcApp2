@@ -10,7 +10,6 @@
         <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="User" asp-action="Dashboard">Buy</a>
         <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="user" asp-action="Sell">Sell</a>
         <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="user" asp-action="CarStatus">Car Status</a>
-        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="user" asp-action="chat">Chat with admin</a>
 
         <!-- Dropdown for Profile and Logout -->
         <div class="dropdown hover-dropdown">
@@ -19,6 +18,7 @@
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownProfile">
                 <li><a class="dropdown-item" href="@Url.Action("ViewProfile", "Account", new { email = user.Email })">Profile</a></li>
+                <li><a class="dropdown-item" href="@Url.Action("TestDrives", "User")">My TestDrives</a></li>
                 <li><a class="dropdown-item" href="@Url.Action("Logout", "Account")">Logout</a></li>
             </ul>
         </div>
@@ -32,6 +32,8 @@ else if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
         <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="Admin" asp-action="Index">Requests</a>
         <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="Admin" asp-action="RequestApproved">Requests Approved</a>
         <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="Admin" asp-action="GetVerificationPending">Verification Pending</a>
+        <a class="btn btn-link text-dark border border-dark rounded-3 mx-2 hover-highlight" asp-controller="Admin" asp-action="PendingTestDrives">TestDrive Pending</a>
+
 
         <!-- Dropdown for Profile and Logout -->
         <div class="dropdown hover-dropdown">

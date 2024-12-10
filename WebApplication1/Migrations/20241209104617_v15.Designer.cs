@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1.Data;
 
@@ -11,9 +12,11 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(WebApplication1Context))]
-    partial class WebApplication1ContextModelSnapshot : ModelSnapshot
+    [Migration("20241209104617_v15")]
+    partial class v15
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -453,6 +456,9 @@ namespace WebApplication1.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TestDriveId"));
 
+                    b.Property<int?>("CarDetailsCarId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CarId")
                         .HasColumnType("int");
 
@@ -464,11 +470,16 @@ namespace WebApplication1.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserRegistrationId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("TestDriveId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CarDetailsCarId");
+
+                    b.HasIndex("UserRegistrationId");
 
                     b.ToTable("TestDrives");
                 });
@@ -664,13 +675,13 @@ namespace WebApplication1.Migrations
 
             modelBuilder.Entity("WebApplication1.Models.TestDrive", b =>
                 {
-                    b.HasOne("WebApplication1.Models.UserRegistration", "User")
+                    b.HasOne("WebApplication1.Models.CarDetails", null)
                         .WithMany("TestDrives")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CarDetailsCarId");
 
-                    b.Navigation("User");
+                    b.HasOne("WebApplication1.Models.UserRegistration", null)
+                        .WithMany("TestDrives")
+                        .HasForeignKey("UserRegistrationId");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.VerificationAppointment", b =>
@@ -682,6 +693,11 @@ namespace WebApplication1.Migrations
                         .IsRequired();
 
                     b.Navigation("Request");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.CarDetails", b =>
+                {
+                    b.Navigation("TestDrives");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Requests", b =>

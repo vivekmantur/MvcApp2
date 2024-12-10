@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1.Data;
 
@@ -11,9 +12,11 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(WebApplication1Context))]
-    partial class WebApplication1ContextModelSnapshot : ModelSnapshot
+    [Migration("20241205103628_v13")]
+    partial class v13
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -301,9 +304,6 @@ namespace WebApplication1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateOnly>("PurchaseDate")
-                        .HasColumnType("date");
-
                     b.Property<string>("SellerName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -443,34 +443,6 @@ namespace WebApplication1.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Sells");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.TestDrive", b =>
-                {
-                    b.Property<int>("TestDriveId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TestDriveId"));
-
-                    b.Property<int>("CarId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("Testdrivedate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("TestDriveId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TestDrives");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.UserRegistration", b =>
@@ -662,17 +634,6 @@ namespace WebApplication1.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.TestDrive", b =>
-                {
-                    b.HasOne("WebApplication1.Models.UserRegistration", "User")
-                        .WithMany("TestDrives")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("WebApplication1.Models.VerificationAppointment", b =>
                 {
                     b.HasOne("WebApplication1.Models.Requests", "Request")
@@ -703,8 +664,6 @@ namespace WebApplication1.Migrations
                     b.Navigation("CarsSold");
 
                     b.Navigation("Sells");
-
-                    b.Navigation("TestDrives");
                 });
 #pragma warning restore 612, 618
         }

@@ -19,9 +19,9 @@ namespace WebApplication1.Models
 
         public RequestStatus status { get; set; } = RequestStatus.Pending;
 
-        public Sell Sell { get; set; }
+        public virtual Sell Sell { get; set; }
 
-        public VerificationAppointment VerificationAppointment { get; set; }
+        public virtual VerificationAppointment VerificationAppointment { get; set; }
 
     }
 }

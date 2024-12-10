@@ -105,7 +105,7 @@ namespace PrimeCarDeals.Controllers
 
             string subject = "Your Car Request Has Been Approved for Verification";
             DateTime appointmentDate = DateTime.Now.AddDays(2); // Two days from today's date
-
+            
             // Format the appointment date as needed (e.g., in a readable format like "MM/dd/yyyy")
             string formattedAppointmentDate = appointmentDate.ToString("MM/dd/yyyy");
 
@@ -193,9 +193,9 @@ namespace PrimeCarDeals.Controllers
         {
             var request = _context.Requests.Include(r => r.Sell).FirstOrDefault(r => r.RequestId == id);
 
-            if (request != null && request.Sell?.Documents != null)
+            if (request != null && request.Sell?.Rc != null)
             {
-                return File(request.Sell.Documents, "application/pdf", "DocumentsFile.pdf");
+                return File(request.Sell.Rc, "application/pdf", "DocumentsFile.pdf");
             }
 
             return NotFound(); 
@@ -206,6 +206,21 @@ namespace PrimeCarDeals.Controllers
             return View();
         }
 
+
+        public IActionResult PendingTestDrives()
+        {
+            List<TestDrive> testDrives = _context.TestDrives.ToList();
+            return View(testDrives);
+        }
         
+
+        public IActionResult ApproveTestDrive(int testDriveId)
+        {
+            TestDrive testDrive = _context.TestDrives.FirstOrDefault(i=>i.TestDriveId== testDriveId);
+            testDrive.Status = TestdriveStatus.Completed;
+            _context.Update(testDrive);
+            _context.SaveChanges();
+            return RedirectToAction("PendingTestDrives", "Admin");
+        }
     }
 }

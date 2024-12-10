@@ -44,6 +44,5 @@ namespace WebApplication1.Models
 
         public UserRegistration User { get; set; }
 
-
     }
 }

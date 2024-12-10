@@ -63,9 +63,11 @@ namespace WebApplication1.Models
         [Required]
         public byte[] RightImage { get; set; }
 
-        public byte[] Documents { get; set; }
-        public UserRegistration User { get; set; }
+        public byte[] Rc { get; set; }
 
-        public Requests Requests { get; set; }
+        public byte[] Insurance { get; set; }
+        public virtual UserRegistration User { get; set; }
+
+        public virtual Requests Requests { get; set; }
     }
 }

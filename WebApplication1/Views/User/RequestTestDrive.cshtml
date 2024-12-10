@@ -1,0 +1,125 @@
+﻿@model WebApplication1.ViewModel.TestDriveRequestViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Test Drive</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .dropdown-menu {
+            position: absolute;
+            z-index: 1000;
+            display: none;
+            min-width: 160px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: .25rem;
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+        }
+
+        .dropdown-item {
+            padding: 0.375rem 0.75rem;
+            cursor: pointer;
+        }
+
+            .dropdown-item:hover {
+                background-color: #f8f9fa;
+            }
+
+        .dropdown-toggle {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-light d-flex flex-column justify-content-center align-items-center min-vh-100">
+    <div class="container">
+        <h1 class="display-4 fw-bold text-center mb-4">Request Test Drive</h1>
+
+        <form method="post" action="@Url.Action("SubmitTestDriveRequest", "User")">
+            <input type="hidden" name="CarId" value="@Model.CarId" />
+
+            <!-- Include AvailableDates as hidden inputs -->
+            @if (Model.AvailableDates != null && Model.AvailableDates.Any())
+            {
+                foreach (var date in Model.AvailableDates)
+                {
+                    <input type="hidden" name="AvailableDates" value="@date" />
+                }
+            }
+
+            <div class="mb-3">
+                <label for="SelectedDate" class="form-label">Choose Test Drive Date</label>
+
+                <!-- Custom Dropdown (Div-based) -->
+                <div class="dropdown">
+                    <div class="dropdown-toggle" id="selectedDate" data-bs-toggle="dropdown" aria-expanded="false">
+                        @if (Model.SelectedDate != null)
+                        {
+                            <span>@Model.SelectedDate.ToString("dd-MM-yyyy")</span>
+                        }
+                        else
+                        {
+                            <span>Select a Date</span>
+                        }
+                    </div>
+                    <ul class="dropdown-menu" aria-labelledby="selectedDate">
+                        @if (Model.AvailableDates != null && Model.AvailableDates.Any())
+                        {
+                            foreach (var date in Model.AvailableDates)
+                            {
+                                var dateValue = date.ToString("yyyy-MM-dd");  // Value for hidden input
+                                var dateText = date.ToString("dd-MM-yyyy");   // Displayed text
+
+                                <li>
+                                    <a class="dropdown-item" href="javascript:void(0);" onclick="setSelectedDate('@dateValue', '@dateText')">
+                                        @dateText
+                                    </a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li><a class="dropdown-item" href="#">No available dates</a></li>
+                        }
+                    </ul>
+                    <input type="hidden" id="SelectedDate" name="SelectedDate" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+                <a href="@Url.Action("Dashboard", "User")" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function setSelectedDate(value, displayText) {
+            // Set the selected date value in the hidden input
+            document.getElementById('SelectedDate').value = value;
+            document.getElementById('selectedDate').innerHTML = displayText;
+            // Close the dropdown
+            var dropdownMenu = document.querySelector('.dropdown-menu');
+            dropdownMenu.style.display = 'none';
+        }
+
+        // Optional: Close the dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            var dropdown = document.querySelector('.dropdown');
+            if (!dropdown.contains(event.target)) {
+                var dropdownMenu = dropdown.querySelector('.dropdown-menu');
+                dropdownMenu.style.display = 'none';
+            }
+        });
+
+        // Show the dropdown when clicking on the dropdown toggle
+        document.querySelector('.dropdown-toggle').addEventListener('click', function () {
+            var dropdownMenu = document.querySelector('.dropdown-menu');
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        });
+    </script>
+</body>
+</html>

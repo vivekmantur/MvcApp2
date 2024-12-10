@@ -60,6 +60,8 @@ namespace WebApplication1.ViewModel
         public IFormFile RightImage { get; set; }
 
         [Required]
-        public IFormFile Documents {  get; set; } 
+        public IFormFile Rc {  get; set; } 
+
+        public IFormFile Insurance { get; set; }
     }
 }

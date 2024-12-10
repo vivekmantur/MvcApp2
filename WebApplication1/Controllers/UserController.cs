@@ -1,8 +1,9 @@
 ﻿using Azure.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
-
+using System.Net.WebSockets;
 using System.Security.Claims;
 using WebApplication1.Data;
 using WebApplication1.Models;
@@ -18,10 +19,13 @@ namespace WebApplication1.Controllers
         public WebApplication1Context context { get; set; }
 
         public SignInManager<UserRegistration> signInManager;
-        public UserController(WebApplication1Context context, SignInManager<UserRegistration> signInManager)
+
+        public UserManager<UserRegistration> userRegister;
+        public UserController(WebApplication1Context context, SignInManager<UserRegistration> signInManager, UserManager<UserRegistration> userRegister)
         {
             this.context = context;
             this.signInManager = signInManager;
+            this.userRegister = userRegister;
         }
         public void UpdateLastActivityTime()
         {
@@ -92,7 +96,8 @@ namespace WebApplication1.Controllers
                     RightImage = ConvertFileToByteArray(sell.RightImage),
                     RearImage = ConvertFileToByteArray(sell.RearImage),
                     FrontImage = ConvertFileToByteArray(sell.FrontImage),
-                    Documents=ConvertFileToByteArray(sell.Documents)
+                    Rc=ConvertFileToByteArray(sell.Rc),
+                    Insurance=ConvertFileToByteArray(sell.Insurance)
                 };
 
                 context.Sells.Add(newSell);
@@ -148,9 +153,47 @@ namespace WebApplication1.Controllers
                 Cars = unsoldCarList,
                 Filter = new CarFilterViewModel()
             };
-
+            ViewBag.User= User.FindFirstValue(ClaimTypes.NameIdentifier);
             return View(model);
         }
+
+
+        public IActionResult UserPayments(string id)
+        {
+            //lazy loading
+            //var user = userRegister.FindByIdAsync(id);
+            //var request = context.Requests.FirstOrDefault(i => i.Userid == id);
+            //var payments = request.Sell;
+            //return View(payments);
+
+
+            //eager loading
+            var request = context.Requests.Include(r => r.Sell).FirstOrDefault(i=>i.Userid == id);
+            return View(request);
+
+
+            //no - tracking query
+            //var request = context.Requests.AsNoTracking().FirstOrDefault(r => r.Userid == id);
+            //request.Sellername = "Mani";
+            ////context.Requests.Update(request);
+            //context.SaveChanges();
+
+            //var request = context.Requests.FirstOrDefault(i => i.Userid == id);
+            //request.Sellername = "shyam";
+            //var changes = context.ChangeTracker.Entries();
+            //foreach (var entry in changes)
+            //{
+            //    Console.WriteLine($"Entity: {entry.Entity.GetType().Name}, State: {entry.State}");
+            //}
+
+
+
+
+
+            return View();
+        }
+
+
 
         // Action to filter cars based on the form submission
         [HttpPost]
@@ -226,6 +269,7 @@ namespace WebApplication1.Controllers
             payment.AmountPaid = amount;
             payment.BuyyerId = userId;
             payment.CarId = carDetails.CarId;
+            payment.PurchaseDate = DateOnly.FromDateTime(DateTime.Now);
 
             context.Payments.Add(payment);
 
@@ -250,7 +294,17 @@ namespace WebApplication1.Controllers
             context.CarsSold.Add(carsSold);
             context.SaveChanges();
 
-
+            List<TestDrive> carTestDrives = context.TestDrives.ToList();
+            carTestDrives=carTestDrives.Where(i=>i.CarId== carDetails.CarId).ToList();
+            foreach (var car in carTestDrives)
+            {
+                if (car.Status == TestdriveStatus.Pending)
+                {
+                    car.Status = TestdriveStatus.Unsuccess;
+                    context.Update(car);
+                    context.SaveChanges();
+                }
+            }
             ViewBag.Total = payment.AmountPaid;
             ViewBag.PaymentId = payment.PaymentId;
             return View();
@@ -267,6 +321,103 @@ namespace WebApplication1.Controllers
             var requests=context.Requests.ToList();
             requests=requests.Where(i=>i.Userid== userId).ToList();
             return View(requests);
+        }
+        public IActionResult RequestTestDrive(int carId)
+        {
+            var car = context.CarDetails.FirstOrDefault(c => c.CarId == carId);
+            if (car == null || car.Status != "unsold")
+            {
+                return RedirectToAction("Dashboard", "User"); 
+            }
+
+            DateTime today = DateTime.Today;
+            List<DateOnly> availableDates = new List<DateOnly>();
+
+            // Add next 6 days (from today)
+            for (int i = 0; i < 6; i++)
+            {
+                availableDates.Add(DateOnly.FromDateTime(today.AddDays(i)));
+            }
+
+            List<System.DateOnly> bookedDates = context.TestDrives
+                .Where(td => td.CarId == carId)
+                .GroupBy(td => td.Testdrivedate)
+                .Where(g => g.Count() >= 5)  
+                .Select(g => g.Key)
+                .ToList();
+
+            String userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<DateOnly> userBookedDates = context.TestDrives
+                .Where(td => td.UserId == userId && td.CarId == carId)
+                .Select(td => td.Testdrivedate)
+                .ToList();
+
+            availableDates = availableDates
+                .Where(d => !bookedDates.Contains(d) && !userBookedDates.Contains(d))
+                .ToList();
+
+            var model = new TestDriveRequestViewModel
+            {
+                CarId = carId,
+                AvailableDates = availableDates
+            };
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public IActionResult SubmitTestDriveRequest(TestDriveRequestViewModel model)
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (ModelState.IsValid && model.SelectedDate != null)
+            { 
+                //checking user selected date testdrive limit
+                int bookingsForSelectedDate = context.TestDrives
+                    .Count(td => td.CarId == model.CarId && td.Testdrivedate == model.SelectedDate);
+
+                if (bookingsForSelectedDate >= 5)
+                {
+                    ModelState.AddModelError("SelectedDate", "The selected date has already reached the maximum number of bookings.");
+                    return View("RequestTestDrive", model);
+                }
+                //checking user previously selected that date before
+                bool userHasBookedOnThatDate = context.TestDrives
+                    .Any(td => td.UserId == userId && td.CarId == model.CarId && td.Testdrivedate == model.SelectedDate);
+
+                if (userHasBookedOnThatDate)
+                {
+                    ModelState.AddModelError("SelectedDate", "You have already booked a test drive for this date.");
+                    return View("RequestTestDrive", model);
+                }
+
+                TestDrive testDrive = new TestDrive
+                {
+                    CarId = model.CarId,
+                    UserId = userId,
+                    Testdrivedate = model.SelectedDate,
+                    Status = TestdriveStatus.Pending
+                };
+
+                context.TestDrives.Add(testDrive);
+                context.SaveChanges();
+
+                return RedirectToAction("Dashboard", "User");
+            }
+
+            return View("RequestTestDrive", model);
+        }
+
+
+
+        public IActionResult TestDrives()
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<TestDrive> testDrives = context.TestDrives.ToList();
+            testDrives = testDrives.Where(i => i.UserId == userId).ToList();
+            return View(testDrives);
+
         }
     }
 }

@@ -32,6 +32,11 @@
 
         <div class="mt-4 text-center">
             <a href="@Url.Action("Dashboard", "User")" class="btn btn-secondary">Back to List</a>
+            @if (Model.Status == "unsold")
+            {
+                <a href="@Url.Action("RequestTestDrive", "User", new { carId = Model.CarId })" class="btn btn-success">Request Test Drive</a>
+            }
+
             <!-- Add a Book Button -->
             <a href="@Url.Action("Book", "User", new { id = Model.CarId })" class="btn btn-primary">Book</a>
         </div>

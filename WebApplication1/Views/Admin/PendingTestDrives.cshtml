@@ -1,0 +1,46 @@
+﻿@model IEnumerable<WebApplication1.Models.TestDrive>
+
+@{
+    ViewData["Title"] = "Test Drive List";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>TestDrive ID</th>
+            <th>UserId</th>
+            <th>Car Id</th>
+            <th>TestDrive Date</th>
+            <th>Status</th>
+            <th>TestDrive Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.TestDriveId</td>
+                <td>@request.UserId</td>
+                <td>@request.CarId</td>
+                <td>@request.Testdrivedate</td>
+                <td>@request.Status</td>
+                @if(request.Status == TestdriveStatus.Pending)
+                {
+                    <td>
+                        <a href="@Url.Action("ApproveTestDrive", "Admin", new { testDriveId = request.TestDriveId })">Approve</a>
+                    </td>
+                }
+                else if(request.Status == TestdriveStatus.Completed)
+                {
+                    <td>Testdrive Successful</td>
+                }
+                else
+                {
+                    <td>Testdrive Unsuccessfull</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

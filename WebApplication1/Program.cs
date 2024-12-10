@@ -7,7 +7,12 @@ using WebApplication1.Models;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("WebApplication1ContextConnection") ?? throw new InvalidOperationException("Connection string 'WebApplication1ContextConnection' not found.");
 
-builder.Services.AddDbContext<WebApplication1Context>(options => options.UseSqlServer(connectionString));
+//builder.Services.AddDbContextPool<WebApplication1Context>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContextPool<WebApplication1Context>(options =>
+{
+    options.UseSqlServer(connectionString).LogTo(Console.WriteLine, LogLevel.Information);
+    //options.UseLazyLoadingProxies();
+});
 builder.Services.AddIdentity<UserRegistration, IdentityRole>(options =>
 {
     // Configure password settings

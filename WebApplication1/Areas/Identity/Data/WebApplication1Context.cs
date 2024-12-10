@@ -20,6 +20,8 @@ public class WebApplication1Context : IdentityDbContext<UserRegistration>
 
     public DbSet<Payment> Payments { get; set; }
 
+    public DbSet<TestDrive> TestDrives { get; set; }
+
     public DbSet<VerificationAppointment> VerificationAppointments { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {

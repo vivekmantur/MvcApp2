@@ -9,6 +9,8 @@ namespace WebApplication1.Models
         public string BuyyerId { get; set; }
         public string CarName { get; set; }
         public string SellerName  { get; set; }
+
+        public DateOnly PurchaseDate { get; set; }
         public decimal AmountPaid { get; set; }
 
     }
